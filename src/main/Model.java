@@ -1,180 +1,154 @@
 package main;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static main.Intake.intake;
+
 public class Model {
 
-	int id;
-	String OBJname;
-	String MTLname;
-	public List<double[]>   verts = new ArrayList<>();
-	public List<double[][]> polys = new ArrayList<>();
-	public List<Material>    mats = new ArrayList<>();
-	public List<String>  rawPolys = new ArrayList<>();
+	public int id;
+	public String OBJname;
+	public String MTLname;
+	public Main.Settings settings;
 
 	public HashMap<Double, String> matUsed = new HashMap<>();
-	public static List<double[][]> comp = new ArrayList<>();
-	public static HashMap<double[], ArrayList<double[][]>> map = new HashMap<>();
+	public HashMap<Integer,List<Integer>> siblingPoints = new HashMap<>();
+	public List<double[]>   vnavg = new ArrayList<>();
+	public List<String>  rawPolys = new ArrayList<>();
 
-	public Model(String filepath, int id){
+	public List<double[]>       v = new ArrayList<>();
+	public List<double[]>      vn = new ArrayList<>();
+	public List<double[][]>     f = new ArrayList<>();
+	public List<Material>    mats = new ArrayList<>();
+
+	public Model(String filepath, int id, Main.Settings settings){
+		this.settings = settings;
 		this.OBJname = "./input/" + filepath;
 		this.id = id;
-		String inputHack = "model 0.0 0.0 0.0 0 1.0 0 0 0 0 " + this.OBJname;
-		Transform.trans(inputHack, (this.id + ""));
-		intake();
+		intake(this);
+		if (this.settings.centerObjects) this.centerObject();
 	}
 
-	// Handles .obj first and then .mtl
-	public void intake(){
-		try {
-			BufferedReader reader;
-			String line;
+	void centerObject() {
+		double[] max = this.v.get(1).clone();
+		double[] min = this.v.get(1).clone();
+		if (this.settings.standardizeScale) {// scales model to a dimension canon of 1
+			for(int i = 1; i < this.v.size(); i++){
+				double[] vert = this.v.get(i).clone();
 
-		// OBJ
-			if (this.OBJname != null) {
-
-				//adds oen to offset from 0 as to keep indices correct
-				this.verts.add(new double[]{Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE});
-
-				// a dirty fucking way to add the id tag inside of the
-				// full path just before the actual obj filename appears
-				// jesus fucking christ
-				String[] temp = this.OBJname.split("/");
-
-				// ADD ID HERE TO GET THE TRANSFORM TO WORK
-				temp[2] = this.id + "_" + temp[2];
-//				temp[2] = temp[2];
-				String path = "/" + temp[1] + "/" + temp[2];
-				String dirPath = new File(".").getCanonicalPath() + path;
-
-				System.out.println(dirPath);
-				reader = new BufferedReader(new FileReader(dirPath));
-				double[] matID = new double[]{0.0, 0.0};
-				while ((line = reader.readLine()) != null) {
-					String[] raw = line.split(" ");
-					double[] num = new double[raw.length];
-
-					// Skips comments
-					if (!raw[0].equals("#")) {
-
-						// Converts raw string into doubles
-						for (int i = 1; i < raw.length; i++) {
-							try { num[i] = Double.parseDouble(raw[i]);
-							} catch (Exception ignored) { }
-						}
-
-						switch (raw[0]) {
-							case "mtllib":
-								this.MTLname = raw[1];
-								break;
-
-							case "v":
-								this.verts.add(new double[]{num[1], num[2], num[3], matID[0]});
-								map.put(new double[]{num[1], num[2], num[3], matID[0]}, null);
-								break;
-
-							case "f":
-								rawPolys.add(line);
-								int[] one = new int[]{
-										Integer.parseInt(raw[1].split("//")[0]),
-										Integer.parseInt(raw[2].split("//")[0]),
-										Integer.parseInt(raw[3].split("//")[0])
-								};
-								double[][] temps = new double[][]{
-										this.verts.get(one[0]).clone(),
-										this.verts.get(one[1]).clone(),
-										this.verts.get(one[2]).clone(),
-										matID.clone()
-								};
-								comp.add(temps);
-								this.polys.add(temps);
-								break;
-
-							case "usemtl":
-								matID[0] = matID[0] + 1;
-								this.matUsed.put(matID[0], raw[1]);
-								break;
-						}
-					}
+				// loops xyz
+				for(int j = 0; j <= 2; j++){
+					if (vert[j] > max[j]){ max[j] = vert[j];}
+					if (vert[j] < min[j]){ min[j] = vert[j];}
 				}
+
 			}
 
-		// MTL
-			if(this.MTLname != null) {
-				String[] temp = OBJname.split("/");
-				String MTLFilePath = temp[0] + "/" + temp[1] + "/" + MTLname;
-				reader = new BufferedReader(new FileReader(MTLFilePath));
-				Material m = new Material();
-				while ((line = reader.readLine()) != null) {
-					String[] raw = line.split(" ");
-					double[] num = new double[raw.length];
-
-					// Skips comments
-					if (!raw[0].equals("#")) {
-
-						// Converts raw string into doubles
-						for (int i = 1; i < raw.length; i++) {
-							try { num[i] = Double.parseDouble(raw[i]);
-							} catch (Exception ignored) {}
-						}
-
-						// Intake
-						switch (raw[0]) {
-							case "newmtl":
-								// .mtl data intake entrance
-								m = new Material();
-								m.name = raw[1];
-								break;
-
-							case "Ns": m.alpha = num[1];break;
-							case "Ka": m.ka = new double[]{num[1], num[2], num[3]};break;
-							case "Kd": m.kd = new double[]{num[1], num[2], num[3]};break;
-							case "Ks": m.ks = new double[]{num[1], num[2], num[3]};break;
-							case "Tr": m.tr = new double[]{num[1], num[2], num[3]};break;
-							case "Ni": m.ni = num[1];break;
-
-							case "illum":
-								if (num[1] == 3){ m.kr = m.ks;}
-								else{ m.kr = new double[]{0.0, 0.0, 0.0};}
-
-								// LOAD COMPLETE CHECK
-								if(m.name != null && m.ka != null && m.kd != null && m.ks != null) {
-									this.mats.add(m);
-								} else System.out.println("MAT LOAD FAILURE");
-								break;
-						}
-					}
-				}
+			double num = Math.pow((max[0] - min[0]), 2)
+					+ Math.pow((max[1] - min[1]), 2)
+					+ Math.pow((max[2] - min[2]), 2);
+			double distance = Math.sqrt(num);
+			double scaleMult = 1 / distance;
+			for (int i = 1; i < this.v.size(); i++) {
+				double[] corrected = {this.v.get(i)[0] * scaleMult, this.v.get(i)[1] * scaleMult, this.v.get(i)[2] * scaleMult};
+				v.set(i, corrected);
 			}
-		} catch (IOException e) { e.printStackTrace(); }
-
-//		clean up
-		// a dirty fucking way to add the id tag inside of the
-		// full path just before the actual obj filename appears
-		// jesus fucking christ
-		String[] temp = this.OBJname.split("/");
-		temp[2] = this.id + "_" + temp[2];
-		String path = "/" + temp[1] + "/" + temp[2];
-		String dirPath = null;
-		try {
-			dirPath = new File(".").getCanonicalPath() + path;
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 
-//		File file = new File(dirPath);
-//		if( !(file.delete())){
-//			System.out.println("FAILED TO DELETE OBJ TRANSFORM FILE");
-//		}
-
-		System.out.println(this.id + ": vertices: " + verts.size());
-
+		max = this.v.get(1).clone();
+		min = this.v.get(1).clone();
+		for(int i = 1; i < this.v.size(); i ++){
+			double[] vert = this.v.get(i).clone();
+			// loops xyz
+			for(int j = 0; j < 3; j++){
+				if (vert[j] > max[j]){ max[j] = vert[j];}
+				if (vert[j] < min[j]){ min[j] = vert[j];}
+			}
+		}
+		double[] center = {(max[0]+min[0])/2,(max[1]+min[1])/2,(max[2]+min[2])/2};
+		for(int i = 1; i < this.v.size(); i ++) {
+			double[] corrected = {this.v.get(i)[0] - center[0], this.v.get(i)[1] - center[1], this.v.get(i)[2] - center[2]};
+			v.set(i, corrected);
+		}
 	}
+
+	void translate(){
+		double[] center = this.settings.translate;
+		if (this.settings.translate != new double[]{0,0,0}) {
+			for (int i = 1; i < this.v.size(); i++) {
+				double[] corrected = {this.v.get(i)[0] + center[0], this.v.get(i)[1] + center[1], this.v.get(i)[2] + center[2]};
+				v.set(i, corrected);
+			}
+		}
+	}
+
+	void calculateNormals(){
+		// uses the cross product of two edges
+		// implemented as (v2 - v1) cross-product (v3 - v1)
+
+		double[] wait = {0,0,0};
+		this.vn.add(wait);
+		int[] verts;
+		for(String curPoly: this.rawPolys){
+			String[] raw = curPoly.split(" ");
+			int[] vertices;
+			curPoly = curPoly.substring(1).replace(" ","");
+			if(curPoly.contains("//")){
+				verts = new int[]{Integer.parseInt(raw[1].split("//")[0]),
+						Integer.parseInt(raw[2].split("//")[0]),
+						Integer.parseInt(raw[3].split("//")[0])};
+			} else {
+				verts = new int[]{Integer.parseInt(raw[1].split("/")[0]),
+						Integer.parseInt(raw[2].split("/")[0]),
+						Integer.parseInt(raw[3].split("/")[0])};
+			}
+
+			double [] u = { //B-A
+					this.v.get(verts[1])[0] - this.v.get(verts[0])[0],
+					this.v.get(verts[1])[1] - this.v.get(verts[0])[1],
+					this.v.get(verts[1])[2] - this.v.get(verts[0])[2]};
+			double [] v = { //A-B
+					this.v.get(verts[2])[0] - this.v.get(verts[0])[0],
+					this.v.get(verts[2])[1] - this.v.get(verts[0])[1],
+					this.v.get(verts[2])[2] - this.v.get(verts[0])[2]};
+			double[] vn = {
+					(u[1] * v[2]) - (u[2] * v[1]),
+					(u[2] * v[0]) - (u[0] * v[2]),
+					(u[1] * v[1]) - (u[1] * v[0])
+			};
+
+			double length = Math.sqrt(vn[0] * vn[0] + vn[1] * vn[1] + vn[2] * vn[2]);
+			double[] vnNormal = {vn[0]/length, vn[1]/length, vn[2]/length};
+			this.vn.add(vnNormal);
+		}
+
+		// averages
+		if(this.settings.avgVertexNormals) {
+			this.vnavg = new ArrayList<>(this.vn);
+			for (Integer key : this.siblingPoints.keySet()) {
+				List<Integer> t = this.siblingPoints.get(key);
+				int cnt = 0;
+				double[] build = {0, 0, 0};
+				for (Integer integer : t) {
+					build[0] += this.vn.get(integer)[0];
+					build[1] += this.vn.get(integer)[1];
+					build[2] += this.vn.get(integer)[2];
+					cnt++;
+				}
+				build[0] = build[0] / cnt;
+				build[1] = build[1] / cnt;
+				build[2] = build[2] / cnt;
+
+				double length = Math.sqrt(build[0] * build[0] + build[1] * build[1] + build[2] * build[2]);
+				double[] vnNormal = {build[0] / length, build[1] / length, build[2] / length};
+				this.vnavg.set(key, vnNormal);
+			}
+
+			this.vn = new ArrayList<>(this.vnavg);
+		}
+	}
+
 
 }
