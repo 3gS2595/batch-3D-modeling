@@ -2,10 +2,8 @@ package main;
 
 import me.tongfei.progressbar.ProgressBar;
 
-import java.io.IOException;
-
 public class Generate {
-    public Generate(Model[] parent) {
+    public static Model gen(Model[] parent) {
         // iterates through each point in mother
         // finds closest point in father
         // calculates and records midpoint record holder
@@ -36,6 +34,6 @@ public class Generate {
                 pb0.step();
             }
         }
-        new Output(parent[0], parent[0].OBJname, parent[1].OBJname);
+        return parent[0];
     }
 }

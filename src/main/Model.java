@@ -29,37 +29,39 @@ public class Model {
 		this.id = id;
 		intake(this);
 		if (this.settings.centerObjects) this.centerObject();
+		if (this.settings.standardizeScale) this.standardizeScale();
+	}
+	void standardizeScale(){
+		double[] max = this.v.get(1).clone();
+		double[] min = this.v.get(1).clone();
+
+		for(int i = 1; i < this.v.size(); i++){
+			double[] vert = this.v.get(i).clone();
+
+			// loops xyz
+			for(int j = 0; j <= 2; j++){
+				if (vert[j] > max[j]){ max[j] = vert[j];}
+				if (vert[j] < min[j]){ min[j] = vert[j];}
+			}
+
+		}
+
+		double num = Math.pow((max[0] - min[0]), 2)
+				+ Math.pow((max[1] - min[1]), 2)
+				+ Math.pow((max[2] - min[2]), 2);
+		double distance = Math.sqrt(num);
+		double scaleMult = 1 / distance;
+		for (int i = 1; i < this.v.size(); i++) {
+			double[] corrected = {this.v.get(i)[0] * scaleMult, this.v.get(i)[1] * scaleMult, this.v.get(i)[2] * scaleMult};
+			v.set(i, corrected);
+		}
+
 	}
 
 	void centerObject() {
 		double[] max = this.v.get(1).clone();
 		double[] min = this.v.get(1).clone();
-		if (this.settings.standardizeScale) {// scales model to a dimension canon of 1
-			for(int i = 1; i < this.v.size(); i++){
-				double[] vert = this.v.get(i).clone();
-
-				// loops xyz
-				for(int j = 0; j <= 2; j++){
-					if (vert[j] > max[j]){ max[j] = vert[j];}
-					if (vert[j] < min[j]){ min[j] = vert[j];}
-				}
-
-			}
-
-			double num = Math.pow((max[0] - min[0]), 2)
-					+ Math.pow((max[1] - min[1]), 2)
-					+ Math.pow((max[2] - min[2]), 2);
-			double distance = Math.sqrt(num);
-			double scaleMult = 1 / distance;
-			for (int i = 1; i < this.v.size(); i++) {
-				double[] corrected = {this.v.get(i)[0] * scaleMult, this.v.get(i)[1] * scaleMult, this.v.get(i)[2] * scaleMult};
-				v.set(i, corrected);
-			}
-		}
-
-		max = this.v.get(1).clone();
-		min = this.v.get(1).clone();
-		for(int i = 1; i < this.v.size(); i ++){
+		for (int i = 1; i < this.v.size(); i ++){
 			double[] vert = this.v.get(i).clone();
 			// loops xyz
 			for(int j = 0; j < 3; j++){

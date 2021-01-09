@@ -1,56 +1,81 @@
 package main;
 import com.rits.cloning.Cloner;
 
-public class Main {
-    long    startTime = time();
-    Settings settings = new Settings();
-    public static class Settings {
-        String                 file1 = "cow.obj";
-        String                 file2 = "mother.obj";
-        double                 ratio = .5;
-        double[]           translate = {0,0,0};
+import java.util.ArrayList;
+import java.util.List;
 
-        boolean             threaded = false; // broken
-        boolean   removeUsedVertices = true;  // works in standard
-        boolean     standardizeScale = true;
+public class Main {
+    long startTime = time();
+    public static class Settings {
+        String                 file1 = "father.obj";
+        String                 file2 = "cow.obj";
+        String        outputFilePath = "/media/sf_digital/hephaestus/dump/";
+        String    outputFileNameNote = "";
+        int               iterations = 4;
+        double                 ratio = 0.5;
+        double[]         maxDistance = {2,1,1};  // range of iteration movement
+        boolean             threaded = false;    // somewhat broken
+        boolean   removeUsedVertices = true;     // works in standard
+        boolean     standardizeScale = false;
         boolean        centerObjects = true;
-        boolean prioritizeByDistance = false; // broken
-        boolean        VertexNormals = true;
+        boolean prioritizeByDistance = false;   // broken
+        boolean        VertexNormals = false;
         boolean     avgVertexNormals = false;
+
+        double[]           translate = {0,0,0}; // variable used during moving
+        double[]            moveStep = {0,0,0}; // distance each iteration moves
     }
 
     public static void main(String[] args){
         System.out.println("-hephaestus");
         Main run = new Main();
-        run.mainRun();
-        run.runTime();
-    } void mainRun(){
-        Model[] parent = createParents(settings);
 
-        for ( int i = 0; i < 13; i = i + 3) {
-            parent[0].settings.translate = new double[]{i, i, 0};
-            generate(parent);
+        Settings settings = new Settings();
+        run.mainRun(settings);
+
+        run.runTime();
+    }
+    void mainRun(Settings settings){
+        Model[] parent = createParents(settings);
+        List<Model> offspring = new ArrayList<>();
+
+        // sets it back and then iterates forward
+        parent[0].settings.translate = new double[]{
+                -settings.maxDistance[0],
+                -settings.maxDistance[1],
+                -settings.maxDistance[2]};
+        parent[0].translate();
+        parent[0].settings.moveStep = new double[]{
+                (settings.maxDistance[0] * 2) / settings.iterations,
+                (settings.maxDistance[1] * 2) / settings.iterations,
+                (settings.maxDistance[2] * 2) / settings.iterations};
+
+        for ( double i = 0; i < settings.iterations; i++) {
+            parent[0].settings.translate = new double[]{
+                    parent[0].settings.moveStep[0],
+                    parent[0].settings.moveStep[1],
+                    parent[0].settings.moveStep[2]};
+            parent[0].translate();
+            offspring.add(generate(parent));
         }
+        new Output(offspring);
     }
 
     // you are a farmer now , till your fields well
     // intake from a folder , run permutations between all objects in folder
-    // accumulate output objects , output the run in multi object .obj
-
-
-
-
-
+    // handle dimension of polygon correctly support n-dimensions
+    // clean out moveStep somehow
 
     // ---------------------------------------------------------------------
-    void generate(Model[] parent){
-        parent[0].translate();
-        parent[1].translate();
+    Model generate(Model[] parent){
         Cloner cloner=new Cloner();
         Model[] parentClone = cloner.deepClone(parent);
-        if (parent[0].settings.prioritizeByDistance) new GeneratePrioritizeDistance(parentClone);
-        else if (parent[0].settings.threaded) new GenerateThreaded(parentClone);
-        else new Generate(parentClone);
+        Model offspring;
+        if (parent[0].settings.prioritizeByDistance) offspring = GeneratePrioritizeDistance.gen(parentClone);
+        else if (parent[0].settings.threaded) offspring = GenerateThreaded.gen(parentClone);
+        else offspring = Generate.gen(parentClone);
+
+        return offspring;
     }
 
     Model[] createParents(Settings settings){
@@ -75,7 +100,6 @@ public class Main {
         long s = ((time() - startTime) / 1000) % 60;
         System.out.format("runtime %d.%dm ", m, s);
     }
-
 }
 
 

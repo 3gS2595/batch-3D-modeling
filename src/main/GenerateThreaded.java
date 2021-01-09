@@ -3,21 +3,34 @@ package main;
 import me.tongfei.progressbar.ProgressBar;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class GenerateThreaded {
-    int cnt = -1;
-    public GenerateThreaded(Model[] parent){
+    static int cnt;
+    static List<double[]> synlist;
+
+    public static Model gen(Model[] parent) {
+        GenerateThreaded run = new GenerateThreaded();
+        parent[0].v = run.run(parent);
+        return parent[0];
+    }
+    public List<double[]> run(Model[] parent){
+        cnt = -1;
+        synlist = Collections.synchronizedList(new ArrayList<>(parent[0].v));
         // iterates through each point in mother
         // finds closest point in father
         // calculates and records midpoint record holder
         // removes used point in father (toggleable)
+        GenerateThreaded gen = new GenerateThreaded();
         try (ProgressBar pb0 = new ProgressBar("producing offspring", parent[0].v.size())) {
-            parent[0].v.parallelStream().forEach(item -> generate(getAndIncrement(), parent, pb0));
+            parent[0].v.parallelStream().forEach(item -> gen.generate(getAndIncrement(), parent, synlist, pb0));
         }
-        new Output(parent[0], parent[0].OBJname, parent[1].OBJname);
+        return synlist;
     }
-    public void generate(int i, Model[] parent, ProgressBar pb0) {
+    public void generate(int i, Model[] parent, List<double[]> synl, ProgressBar pb0) {
         double record = Double.MAX_VALUE;
         int recordIndex = -1;
         for (int j = 0; j < parent[1].v.size(); j++) {
@@ -31,18 +44,21 @@ public class GenerateThreaded {
             }
         }
 
-        double[] midpoint = {(parent[0].v.get(i)[0] + parent[1].v.get(recordIndex)[0]) / 2
-                , (parent[0].v.get(i)[1] + parent[1].v.get(recordIndex)[1]) / 2
-                , (parent[0].v.get(i)[2] + parent[1].v.get(recordIndex)[2]) / 2};
-        parent[0].v.set(i, midpoint);
+        double distance = (parent[0].settings.ratio * record)/record;
+        double x = parent[0].v.get(i)[0] + (distance*(parent[1].v.get(recordIndex)[0] - parent[0].v.get(i)[0]));
+        double y = parent[0].v.get(i)[1] + (distance*(parent[1].v.get(recordIndex)[1] - parent[0].v.get(i)[1]));
+        double z = parent[0].v.get(i)[2] + (distance*(parent[1].v.get(recordIndex)[2] - parent[0].v.get(i)[2]));
 
-        //create synchronized list and modify that and then switch it back in for the models.v
-        // might not need to switch in since it will be thrown away i think
-        //if(recordIndex!=-1 && parent[0].settings.removeUsedVertices)parent[1].v.remove(recordIndex);
+        double[] midpoint = {x,y,z};
+        synl.set(i, midpoint);
+
+        if(recordIndex!=-1 && parent[0].settings.removeUsedVertices)
+            System.out.println("remove vertice feature broken in generateThreaded");
+//        if(recordIndex!=-1 && parent[0].settings.removeUsedVertices) synlist.remove(recordIndex);
         pb0.step();
     }
 
-    public int getAndIncrement(){
+    public static int getAndIncrement(){
         cnt = cnt + 1;
         return cnt;
     }

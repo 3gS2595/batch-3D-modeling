@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GeneratePrioritizeDistance  {
-    public GeneratePrioritizeDistance(Model[] parent){
+    public static Model gen(Model[] parent){
         // iterates through each point in mother
         Map<Integer, Double[][]> closePoints = new HashMap<>();
 
@@ -64,13 +64,11 @@ public class GeneratePrioritizeDistance  {
                 closePoints.remove(recordIndexM);
                 // removes used point in father
                 // REMOVE IS NOT IMPLEMENTED
-                if (parent[0].settings.removeUsedVertices) parent[1].v.remove((int)recordIndexM);
+                // if (parent[0].settings.removeUsedVertices) parent[1].v.remove((int)recordIndexM);
                 pb1.stepBy(1);
             }
         }
 
-        new Output(parent[0], parent[0].OBJname, parent[1].OBJname);
-
-
+        return parent[0];
     }
 }
