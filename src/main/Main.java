@@ -1,113 +1,95 @@
 package main;
 import com.rits.cloning.Cloner;
-import main.generate.Generate;
-import main.generate.GenerateDistPrioritize;
-import main.generate.GenerateThreaded;
-import main.model.Model;
-import main.model.Output;
+import main.form.Form;
+import main.tools.ObjOutput;
 import main.pool.ThreadPool;
-import me.tongfei.progressbar.ProgressBar;
-
+import main.tools.FileLoader;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    long startTime = time();
+
     public static class Settings {
-        public String                 file1 = "cow.obj";
-        public String                 file2 = "arrow.obj";
+        public String           inputFolder = "/media/sf_digital/hephaestus/intake";
         public String        outputFilePath = "/media/sf_digital/hephaestus/dump/";
-        public String    outputFileNameNote = "";
-        public int                threadCnt = 4;
-        public int[]             iterations = {0, 10};
+        public String   outputFileNameNotes = "";
+        public boolean   removeUsedVertices = false;
+        public boolean prioritizeByDistance = false;    // broken
         public double                 ratio = 0.5;
-        public double[]         maxDistance = {2,0,0};  // range of iteration movement
-        public boolean             threaded = true;    // somewhat broken
-        public boolean   removeUsedVertices = false;     // works in standard
+        public double[]         maxDistance = {5,0,0};  // range of iteration movement
+        public double[]            rotation = {0,0,0};  // range of iteration movement
+        public int               iterations = 5;
         public boolean     standardizeScale = true;
         public boolean        centerObjects = true;
-        public boolean prioritizeByDistance = false;   // broken
         public boolean        VertexNormals = false;
         public boolean     avgVertexNormals = false;
-
+        // closet variables
+        public int                threadCnt = 4;
         public double[]           translate = {0,0,0}; // variable used during moving
         public double[]            moveStep = {0,0,0}; // distance each iteration moves
+        public String                 file0 = "";
+        public String                 file1 = "";
     }
 
     public static void main(String[] args){
         System.out.println("-hephaestus");
-        Main run = new Main();
+        Main task = new Main();
         Settings settings = new Settings();
-        run.mainRun(settings);
-        run.runTime();
+        task.run(settings);
+        task.runTime();
     }
-    void mainRun(Settings settings){
-        Model[] parent = createParents(settings);
-        List<Model> offspring = new ArrayList<>();
+    void run(Settings settings){
+        List<Form[]> wells = FileLoader.loadWells(settings);
+        List<Form> offspring = new ArrayList<>();
+        printSettings(settings);
 
-        // sets it back and then iterates forward
-        parent[0].settings.translate = new double[]{
-                -settings.maxDistance[0],
-                -settings.maxDistance[1],
-                -settings.maxDistance[2]};
-        parent[0].translate();
-        parent[0].settings.moveStep = new double[]{
-                (settings.maxDistance[0] * 2) / settings.iterations[1],
-                (settings.maxDistance[1] * 2) / settings.iterations[1],
-                (settings.maxDistance[2] * 2) / settings.iterations[1]};
+        for(Form[] well : wells) {
+            ThreadPool pool = new ThreadPool(settings.threadCnt);
 
-        ThreadPool main = new ThreadPool(settings.threadCnt);
-        for ( double i = 0; i < settings.iterations[1]; i++) {
-            parent[0].settings.translate = new double[]{
-                    parent[0].settings.moveStep[0],
-                    parent[0].settings.moveStep[1],
-                    parent[0].settings.moveStep[2]};
-            parent[0].translate();
-
-            Cloner cloner=new Cloner();
-            Model[] parentClone = cloner.deepClone(parent);
-            main.createTasks(parentClone);
-            main.run();
-            main.pb0.setExtraMessage((i+1) +  "/" + settings.iterations[1]);
-            offspring.add(main.ret());
+            for (double i = 0; i < settings.iterations; i++) {
+                step(well);
+                pool.initializeTask(clone(well));
+                pool.run();
+                pool.pb0.setExtraMessage((i + 1) + "/" + settings.iterations);
+                offspring.add(pool.ret());
+            }
+            pool.pb0.close();
+            new ObjOutput(offspring);
         }
-        main.pb0.close();
-        new Output(offspring);
     }
 
-    // you are a farmer now , till your fields well
-    // intake from a folder , run permutations between all objects in folder
-    // handle dimension of polygon correctly support n-dimensions
-    // clean out moveStep somehow
 
     // ---------------------------------------------------------------------
-    Model generate(Model[] parent){
-        Cloner cloner=new Cloner();
-        Model[] parentClone = cloner.deepClone(parent);
-        Model offspring;
-        if (parent[0].settings.prioritizeByDistance) offspring = GenerateDistPrioritize.gen(parentClone);
-        else if (parent[0].settings.threaded) offspring = GenerateThreaded.gen(parentClone);
-        else offspring = Generate.gen(parentClone);
+    // you are a farmer now , till your fields well
+    // rotate the forms rather than move
+    // output in stepped output to be viewed together in blender
+    // decide on a placement hierarchy / organization
 
-        return offspring;
+    // moves the form before each iteration
+    private void step(Form[] wellspring){
+        wellspring[0].settings.translate = new double[]{
+                wellspring[0].settings.moveStep[0],
+                wellspring[0].settings.moveStep[1],
+                wellspring[0].settings.moveStep[2]};
+        wellspring[0].translate();
     }
 
-    Model[] createParents(Settings settings){
-        Model file0 = new Model(settings.file1, 0, settings);
-        Model file1 = new Model(settings.file2, 1, settings);
-
-        // [0] = mother , donates polygons
-        Model[] parent = {null, null};
-        if (file0.v.size() > file1.v.size()) {
-            parent[0] = file1;
-            parent[1] = file0;
-        } else {
-            parent[0] = file0;
-            parent[1] = file1;
-        }
-        return parent;
+    private void printSettings(Settings settings) {
+        System.out.print("           iterations " + settings.iterations + "\n");
+        System.out.print("   removeUsedVertices " + settings.removeUsedVertices + "\n");
+        System.out.print("     standardizeScale " + settings.standardizeScale + "\n");
+        System.out.print("        centerObjects " + settings.centerObjects + "\n");
+        System.out.print(" prioritizeByDistance " + settings.prioritizeByDistance + "\n");
+        System.out.print("        vertexNormals " + settings.VertexNormals + "\n");
+        System.out.print("     avgVertexNormals " + settings.avgVertexNormals + "\n");
     }
 
+    private Form[] clone(Form[] wellspring){
+        Cloner cloner = new Cloner();
+        return cloner.deepClone(wellspring);
+    }
+
+    long startTime = time();
     long time() { return System.currentTimeMillis();}
     void runTime(){
         long m = ((time() - startTime) / 1000) / 60;

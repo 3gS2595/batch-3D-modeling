@@ -1,10 +1,6 @@
 package main.pool;
 
-import main.model.Model;
-import main.model.Output;
-
-import java.util.ArrayList;
-import java.util.List;
+import main.tasks.Task;
 
 public class WorkerThread extends Thread {
     ThreadPool pool;
@@ -16,10 +12,8 @@ public class WorkerThread extends Thread {
         Task task;
         while (true) {
             task = pool.get();
-            if(task != null) {
-                task.run();
-            }
-            else return;
+            if(task != null) { task.run();
+            } else return;
         }
     }
 }
