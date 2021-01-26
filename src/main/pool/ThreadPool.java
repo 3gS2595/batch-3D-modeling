@@ -4,16 +4,18 @@ import main.form.Form;
 import main.tasks.*;
 import me.tongfei.progressbar.ProgressBar;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ThreadPool extends Thread{
     private static int THREAD_CNT;
     public Form[] parent;
+    public List<Form> offspring = new ArrayList<>();
 
     // Book keeping
     // private static final LinkedList<Task>  priority = new LinkedList<>();
     private static final LinkedBlockingQueue<Task> queue = new LinkedBlockingQueue<>();
-    public Form offspring;
     public ProgressBar pb0;
 
     public ThreadPool(int threadCnt) {
@@ -37,25 +39,27 @@ public class ThreadPool extends Thread{
 
         //waits for all threads to return home
         for(WorkerThread temp:threads){
-            try { temp.join(); } catch (InterruptedException e) { e.printStackTrace(); }
+            try { temp.join();} catch (InterruptedException e) { e.printStackTrace(); }
         }
     }
 
     public void initializeTask(Form[] parent) {
         this.parent = parent;
-        for(int i = 0; i < parent[0].v.size(); i++) {
-            if (parent[0].settings.removeUsedVertices) {
+        this.offspring.add(new Form(parent[0]));
+        int offIndex = this.offspring.size()-1;
+        for(int i = 0, j = this.offspring.get(this.offspring.size()-1).v.size(); i < j; i++) {
+            if (this.offspring.get(offIndex).settings.removeUsedVertices) {
                 execute(new RemoveUsedTree(i, this));
             }
-            else if (parent[0].settings.prioritizeByDistance) {
+            else if (this.offspring.get(offIndex).settings.prioritizeByDistance) {
                 execute(new PrioritizeDistance(i, this));
             }
-            else if (parent[0].settings.findBySegment) {
+            else if (this.offspring.get(offIndex).settings.findBySegment) {
                 this.parent[0].split();
                 this.parent[1].split();
                 execute(new FindBySegment(i, this));
             }
-            else execute(new StandardTree(i, this));
+            else execute(new StandardTree(i, offIndex, this));
         }
     }
 
@@ -76,7 +80,7 @@ public class ThreadPool extends Thread{
         }
     }
 
-    public Form ret() {
+    public List<Form> ret() {
         return offspring;
     }
 }

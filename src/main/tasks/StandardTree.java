@@ -10,11 +10,13 @@ import java.util.List;
 
 public class StandardTree implements Task {
     int i;
+    int offIndex;
     ThreadPool pool;
     Form[] parent;
 
-    public StandardTree(int i, ThreadPool pool) {
+    public StandardTree(int i, int offIndex, ThreadPool pool) {
         this.i = i;
+        this.offIndex = offIndex;
         this.pool = pool;
         this.parent = pool.parent;
     }
@@ -38,16 +40,15 @@ public class StandardTree implements Task {
                 parent[0].v.get(i)[1] + (ratio*(closeV[1] - parent[0].v.get(i)[1])),
                 parent[0].v.get(i)[2] + (ratio*(closeV[2] - parent[0].v.get(i)[2]))};
 
-        pool.parent[0].newPoints.put(i, midpoint);
+        pool.offspring.get(offIndex).newPoints.put(i, midpoint);
 
         // checks for completion
-        if (parent[0].newPoints.size() == parent[0].v.size()) {
+        if (pool.offspring.get(offIndex).newPoints.size() == parent[0].v.size()) {
             List<double[]> newV = new ArrayList<>();
             for (int i = 0; i < parent[0].v.size(); i++) {
-                newV.add(pool.parent[0].newPoints.get(i));
+                newV.add(pool.offspring.get(offIndex).newPoints.get(i));
             }
-            parent[0].v = new ArrayList<>(newV);
-            pool.offspring = parent[0];
+            pool.offspring.get(offIndex).v = new ArrayList<>(newV);
         }
     }
 }

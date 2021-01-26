@@ -12,10 +12,10 @@ import java.util.List;
 
 public class ObjIntake {
     // Handles .obj first and then .mtl
-    public static Form ObjIntake(Form form) {
+    public static Form intake(Form form) {
         int fileLength = 0;
         try {
-            fileLength = countLinesOld(form.ObjName);
+            fileLength = countLines(form.ObjName);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -144,19 +144,16 @@ public class ObjIntake {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-//            System.out.println("vertices: " + model.v.size());
-//            System.out.println();
             return form;
 
     }
 
-    public static int countLinesOld(String filename) throws IOException {
+    public static int countLines(String filename) throws IOException {
         try (InputStream is = new BufferedInputStream(new FileInputStream(filename))) {
             byte[] c = new byte[1024];
             int count = 0;
-            int readChars = 0;
             boolean empty = true;
+            int readChars;
             while ((readChars = is.read(c)) != -1) {
                 empty = false;
                 for (int i = 0; i < readChars; ++i) {

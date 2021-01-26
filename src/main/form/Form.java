@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import static main.tools.ObjIntake.ObjIntake;
+import static main.tools.ObjIntake.intake;
 
 public class Form {
 
@@ -19,15 +19,10 @@ public class Form {
 
 	public List<double[]>       v = new ArrayList<>();
 	public List<double[]>      vn = new ArrayList<>();
-	public List<double[][]>     f = new ArrayList<>();
+	public List<String>      rawf = new ArrayList<>();
 	public List<Material>    mats = new ArrayList<>();
-	public List<String>    rawMats = new ArrayList<>();
-	public HashMap<Double, String> matUsed = new HashMap<>();
 	public QuadTreeKD2     KdTree = QuadTreeKD2.create(3);
 	public double[]         moved = {0,0,0,0,0,0}; // variable used during moving
-
-	// raw string input
-	public List<String>      rawf = new ArrayList<>();
 
 	// normal averaging
 	public List<double[]>   vnavg = new ArrayList<>();
@@ -48,13 +43,22 @@ public class Form {
 		this.ObjName = this.ObjName.replace("\\", "/");
 		String[] nameSplit = ObjName.split("/");
 		this.id = nameSplit[nameSplit.length-2].concat("/"+nameSplit[nameSplit.length-1]);
-		ObjIntake(this);
+		intake(this);
 		if (this.settings.centerObjects) this.centerObject();
 		if (this.settings.standardizeScale) this.standardizeScale();
 		this.buildTree();
 	}
 
-	public void buildTree() {
+	// used to make basis for offspring
+    public Form(Form form) {
+		this.settings = form.settings;
+		this.v = new ArrayList<>(form.v);
+		this.vn = new ArrayList<>(form.vn);
+		this.rawf = new ArrayList<>(form.rawf);
+		this.buildTree();
+    }
+
+    public void buildTree() {
 		for(int i = 0; i < this.v.size(); i++){
 			this.KdTree.insert(new double[]{this.v.get(i)[0], this.v.get(i)[1], this.v.get(i)[2]}, i);
 		}
@@ -97,8 +101,8 @@ public class Form {
 	}
 
 	public void centerObject() {
-		double[] max = this.v.get(1).clone();
-		double[] min = this.v.get(1).clone();
+		double[] max = this.v.get(0).clone();
+		double[] min = this.v.get(0).clone();
 		for (double[] doubles : this.v) {
 			double[] vert = doubles.clone();
 			// loops xyz
@@ -126,7 +130,9 @@ public class Form {
 				v.set(i, corrected);
 			}
 		}
-		this.moved = new double[]{(this.moved[0] + amount[0]),(this.moved[1] + amount[1]),(this.moved[2] + amount[2]), this.moved[3], this.moved[4], this.moved[5]};
+		this.moved[0] += amount[0];
+		this.moved[1] += amount[1];
+		this.moved[2] += amount[2];
 	}
 
 	// ROTATE

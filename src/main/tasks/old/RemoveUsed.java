@@ -50,7 +50,7 @@ public class RemoveUsed implements Task {
                 newV.add(pool.parent[0].newPoints.get(i));
             }
             pool.parent[0].v = new ArrayList<>(newV);
-            pool.offspring = pool.parent[0];
+            pool.offspring.add(parent[0]);
         } else if (pool.parent[0].newPoints.size() > pool.parent[0].v.size()) {
             System.out.println(pool.parent[0].newPoints.size());
         }

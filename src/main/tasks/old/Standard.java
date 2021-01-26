@@ -51,7 +51,7 @@ public class Standard implements Task {
                     newV.add(pool.parent[0].newPoints.get(i));
                 }
                 parent[0].v = new ArrayList<>(newV);
-                pool.offspring = parent[0];
+                pool.offspring.add(parent[0]);
             }
         }
     }

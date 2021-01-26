@@ -17,7 +17,7 @@ public class ObjOutput {
         String dirPath = settings.outputFilePath + "\\"
                 +   date.substring(5,10) + "_" + date.substring(0,4)+ "__" + time.substring(0, 8)
                 + settings.outputFileNameNotes + "\\";
-        System.out.println(dirPath);
+        System.out.println("run output- " + dirPath);
         File file = new File(dirPath);
 
         //Creating the directory
@@ -26,7 +26,7 @@ public class ObjOutput {
         else return settings.outputFilePath;
     }
 
-    public ObjOutput(List<Form> outputs, double[] groupStep) {
+    public static void output(List<Form> outputs, double[] groupStep) {
         try {
             if (outputs.get(0).settings.VertexNormals) outputs.get(0).calculateNormals();
 
