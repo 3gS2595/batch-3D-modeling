@@ -37,6 +37,11 @@
             <artifactId>cloning</artifactId>
             <version>1.10.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.tinspin</groupId>
+            <artifactId>tinspin-indexes</artifactId>
+            <version>1.7.1</version>
+        </dependency>
     </dependencies>
     <groupId>ogr</groupId>
     <artifactId>breaching</artifactId>
