@@ -54,6 +54,9 @@ public class ThreadPool extends Thread{
             else if (this.offspring.get(offIndex).settings.prioritizeByDistance) {
                 execute(new PrioritizeDistance(i, this));
             }
+            else if (this.offspring.get(offIndex).settings.singleOut) {
+                execute(new SingleOut(i, offIndex,this));
+            }
             else if (this.offspring.get(offIndex).settings.findBySegment) {
                 this.parent[0].split();
                 this.parent[1].split();

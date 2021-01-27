@@ -21,7 +21,11 @@ public class SetUp {
 
 
         List<Form[]> wellsprings = new ArrayList<>();
-        for(int i = 0; i < load.size(); i++) {
+        if(settings.singleOut){
+            for(Form form : load){
+                wellsprings.add(new Form[]{form});
+            }
+        } else for(int i = 0; i < load.size(); i++) {
             for (int j = i + 1; j < load.size(); j++) {
                 if(!files.get(i).equals(files.get(j))) {
                     Form file0 = load.get(i);

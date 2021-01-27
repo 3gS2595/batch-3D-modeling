@@ -50,8 +50,11 @@ public class ObjOutput {
             // accounts for movement change introduced
             // by separating forms in current series
             double[] retainCorrectMove = {0,0,0};
-            try (ProgressBar pb1 = new ProgressBar("writting", outputs.size())) {
 
+            String loadName = dirPath.replace("\\", "/");
+            String[] nameSplit = loadName.split("/");
+            loadName = nameSplit[nameSplit.length-1];
+            try (ProgressBar pb1 = new ProgressBar("id " + loadName, outputs.size())) {
                 for (Form offspring : outputs) {
 
                     // Prints .obj
