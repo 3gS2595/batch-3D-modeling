@@ -2,6 +2,7 @@ package main.tools;
 
 import main.form.Form;
 import main.Settings;
+import me.tongfei.progressbar.ProgressBar;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -18,6 +19,7 @@ public class ObjOutput {
                 +   date.substring(5,10) + "_" + date.substring(0,4)+ "__" + time.substring(0, 8)
                 + settings.outputFileNameNotes + "\\";
         System.out.println("run output- " + dirPath);
+        System.out.println();
         File file = new File(dirPath);
 
         //Creating the directory
@@ -48,81 +50,85 @@ public class ObjOutput {
             // accounts for movement change introduced
             // by separating forms in current series
             double[] retainCorrectMove = {0,0,0};
-            for (Form offspring : outputs) {
+            try (ProgressBar pb1 = new ProgressBar("writting", outputs.size())) {
 
-                // Prints .obj
-                int vs = 0;
-                offspring.standardizeScale();
-                offspring.centerObject();
-                offspring.translate(groupStep);
-                offspring.translate(seperate);
-                offspring.moved[0] -= retainCorrectMove[0];
+                for (Form offspring : outputs) {
 
-                Settings settings = offspring.settings;
-                writer.write("# -hephaestus " + "offspring_" + cnt + "\n");
-                writer.write("# Lineage, " + settings.file0 + ", " + settings.file1 + "\n");
-                writer.write("#                moved "  + " x:" + (offspring.moved[0])
-                                            + " y:" + (offspring.moved[1])
-                                            + " z:" + (offspring.moved[2]) + "\n");
-                writer.write("#              rotated "  + " x:" + (offspring.moved[3])
-                                            + " y:" + (offspring.moved[4])
-                                            + " z:" + (offspring.moved[5]) + "\n");
-                writer.write("#                                               \n");
-                writer.write("#   removeUsedVertices " + settings.removeUsedVertices + "\n");
-                writer.write("#     standardizeScale " + settings.standardizeScale + "\n");
-                writer.write("#        centerObjects " + settings.centerObjects + "\n");
-                writer.write("# prioritizeByDistance " + settings.prioritizeByDistance + "\n");
-                writer.write("#        VertexNormals " + settings.VertexNormals + "\n");
-                writer.write("o offspring_" + cnt + "\n");
+                    // Prints .obj
+                    int vs = 0;
+                    offspring.standardizeScale();
+                    offspring.centerObject();
+                    offspring.translate(groupStep);
+                    offspring.translate(seperate);
+                    offspring.moved[0] -= retainCorrectMove[0];
 
-                // MTL file name
-                writer.write("mtllib " + offspring.MtlName + "\n");
-                // V
-                for (int i = 0; i < offspring.v.size(); i++) {
-                    vs++;
-                    writer.write("v" + " " + df.format(offspring.v.get(i)[0])
-                                         + " " + df.format(offspring.v.get(i)[1])
-                                         + " " + df.format(offspring.v.get(i)[2])
-                                         + "\n");
-                }
+                    Settings settings = offspring.settings;
+                    writer.write("# -hephaestus " + "offspring_" + cnt + "\n");
+                    writer.write("# Lineage, " + settings.file0 + ", " + settings.file1 + "\n");
+                    writer.write("#                moved " + " x:" + (offspring.moved[0])
+                            + " y:" + (offspring.moved[1])
+                            + " z:" + (offspring.moved[2]) + "\n");
+                    writer.write("#              rotated " + " x:" + (offspring.moved[3])
+                            + " y:" + (offspring.moved[4])
+                            + " z:" + (offspring.moved[5]) + "\n");
+                    writer.write("#                                               \n");
+                    writer.write("#   removeUsedVertices " + settings.removeUsedVertices + "\n");
+                    writer.write("#     standardizeScale " + settings.standardizeScale + "\n");
+                    writer.write("#        centerObjects " + settings.centerObjects + "\n");
+                    writer.write("# prioritizeByDistance " + settings.prioritizeByDistance + "\n");
+                    writer.write("#        VertexNormals " + settings.VertexNormals + "\n");
+                    writer.write("o offspring_" + cnt + "\n");
 
-                // VN
-                for (double[] vn : offspring.vn) {
-                    writer.write("vn" + " " + df.format(vn[0])
-                                          + " " + df.format(vn[1])
-                                          + " " + df.format(vn[2])
-                                          + "\n");
-                }
-                writer.write("usemtl None\n");
-                writer.write("s off\n");
-                writer.write("g objects\n");
+                    // MTL file name
+                    writer.write("mtllib " + offspring.MtlName + "\n");
+                    // V
+                    for (int i = 0; i < offspring.v.size(); i++) {
+                        vs++;
+                        writer.write("v" + " " + df.format(offspring.v.get(i)[0])
+                                + " " + df.format(offspring.v.get(i)[1])
+                                + " " + df.format(offspring.v.get(i)[2])
+                                + "\n");
+                    }
 
-                // F
-                String curMat = "";
-                for(int j = 0; j < offspring.rawf.size(); j++){
+                    // VN
+                    for (double[] vn : offspring.vn) {
+                        writer.write("vn" + " " + df.format(vn[0])
+                                + " " + df.format(vn[1])
+                                + " " + df.format(vn[2])
+                                + "\n");
+                    }
+                    writer.write("usemtl None\n");
+                    writer.write("s off\n");
+                    writer.write("g objects\n");
+
+                    // F
+                    String curMat = "";
+                    for (int j = 0; j < offspring.rawf.size(); j++) {
 //                    if (curMat != offspring.rawMats.get(j)){
 //                        curMat = offspring.rawMats.get(j);
 //                        writer.write("usemtl " + curMat + "\n");
 //                    }
-                    String f = "f ";
-                    String[] split = offspring.rawf.get(j).split(" ");
-                    String parse = "/";
-                    if (offspring.rawf.get(j).contains("//")) parse = "//";
-                    for (int i = 1; i < split.length; i++) {
-                        int v1 = Integer.parseInt(split[i].split(parse)[0]);
+                        String f = "f ";
+                        String[] split = offspring.rawf.get(j).split(" ");
+                        String parse = "/";
+                        if (offspring.rawf.get(j).contains("//")) parse = "//";
+                        for (int i = 1; i < split.length; i++) {
+                            int v1 = Integer.parseInt(split[i].split(parse)[0]);
 
-                        int v2 = Integer.parseInt(split[i].split(parse)[1]);
-                        if (!parse.equals("//") && split[i].split(parse).length > 2)
-                            v2 = Integer.parseInt(split[i].split(parse)[2]);
-                        f = f.concat((v1 + Vcnt) + "//" + (v2 + VNcnt) + " ");
+                            int v2 = Integer.parseInt(split[i].split(parse)[1]);
+                            if (!parse.equals("//") && split[i].split(parse).length > 2)
+                                v2 = Integer.parseInt(split[i].split(parse)[2]);
+                            f = f.concat((v1 + Vcnt) + "//" + (v2 + VNcnt) + " ");
+                        }
+                        f = f.concat("\n");
+                        writer.write(f);
                     }
-                    f = f.concat("\n");
-                    writer.write(f);
+                    Vcnt += vs;
+                    cnt++;
+                    seperate[0] += 2;
+                    retainCorrectMove[0] += 2;
+                    pb1.step();
                 }
-                Vcnt += vs;
-                cnt++;
-                seperate[0] += 2;
-                retainCorrectMove[0] += 2;
             }
 
             writer.flush();

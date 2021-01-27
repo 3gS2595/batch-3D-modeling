@@ -26,7 +26,6 @@ public class ObjIntake {
                 BufferedReader reader = new BufferedReader(new FileReader(form.ObjName));
 
                 String line;
-                String curMat = "";
                 while ((line = reader.readLine()) != null) {
                     pb1.step();
                     String[] raw = line.split(" ");
@@ -44,7 +43,6 @@ public class ObjIntake {
                             break;
 
                         case "usemtl":
-                            curMat =  raw[1];
                             break;
 
                         case "v":
@@ -52,7 +50,6 @@ public class ObjIntake {
                             break;
 
 //                        case "vn":
-//                            form.rawvn.add(line);
 //                            break;
 
                         case "f":

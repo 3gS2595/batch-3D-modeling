@@ -42,7 +42,7 @@ public class Form {
 		this.ObjName = filepath;
 		this.ObjName = this.ObjName.replace("\\", "/");
 		String[] nameSplit = ObjName.split("/");
-		this.id = nameSplit[nameSplit.length-2].concat("/"+nameSplit[nameSplit.length-1]);
+		this.id = nameSplit[nameSplit.length-1];
 		intake(this);
 		if (this.settings.centerObjects) this.centerObject();
 		if (this.settings.standardizeScale) this.standardizeScale();

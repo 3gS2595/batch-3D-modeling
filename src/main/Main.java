@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args){
-        System.out.println("-hephaestus");
+        System.out.println("-utemporia");
         Main task = new Main();
         task.run(new Settings());
         task.runTime();
