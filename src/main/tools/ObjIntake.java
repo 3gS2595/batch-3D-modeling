@@ -19,8 +19,11 @@ public class ObjIntake {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(form.ObjName);
-        try (ProgressBar pb1 = new ProgressBar("intake", fileLength)) {
+        String loadName;
+        if(form.id.length() >= 15) {
+            loadName = form.id.substring(0, 12) + "..";
+        } else loadName = form.id;
+        try (ProgressBar pb1 = new ProgressBar(loadName , fileLength)) {
                 // OBJ
                 double[] matID = new double[]{0.0, 0.0};
                 BufferedReader reader = new BufferedReader(new FileReader(form.ObjName));
