@@ -4,13 +4,16 @@ import main.form.Form;
 import main.Settings;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class SetUp {
     public static List<Form[]> loadWells(Settings settings){
-        List<String> files = folderIntake(Paths.get(settings.inputFolder).toString());
+        List<String> files = (new Searcher(Paths.get(settings.inputFolder).toString())).search();
         List<Form> load = new ArrayList<>();
         if (files.size() % 2 != 0) files.remove(files.size() - 1);
         System.out.println("intaking-" + files.size());
@@ -68,13 +71,34 @@ public class SetUp {
         }
         return wellsprings;
     }
+    public static class Searcher {
 
-    private static List<String> folderIntake(String filePath){
-        File folder = new File(filePath);
-        List<String> files = new ArrayList<>();
-        for (final File fileEntry : folder.listFiles()) {
-            if(fileEntry.toString().contains(".obj"))files.add(fileEntry.toString());
+        private final String root;
+
+        public Searcher(String root) {
+            this.root = root;
         }
-        return files;
+
+        public List<String> search() {
+            List<String> fs = new ArrayList<>();
+            File folder = new File(root);
+            File[] listOfFiles = folder.listFiles();
+            if (listOfFiles != null) {
+                for (File file : listOfFiles) {
+                    String path = file.getPath().replace('\\', '/');
+                    if (file.isDirectory()) {
+                        fs.addAll(new Searcher(path + "/").search());
+                    } else {
+                        if (file.toString().substring(file.toString().length() - 4).toLowerCase().contains(".obj")) {
+                            fs.add(file.getAbsolutePath());
+                            System.out.println(path);
+                        }
+
+                    }
+                }
+            }
+            return fs;
+        }
     }
+
 }

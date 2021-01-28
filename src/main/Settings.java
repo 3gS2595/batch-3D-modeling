@@ -3,7 +3,7 @@ package main;
 public class Settings {
 
     // hardware
-    public String           inputFolder = "C:\\Users\\Dylan Trinkner\\Documents\\GitHub\\utemporia-\\input\\b";
+    public String           inputFolder = "D:\\";
     public String        outputFilePath = "C:\\Users\\Dylan Trinkner\\Documents\\GitHub\\utemporia-\\out";
     public String   outputFileNameNotes = "_blazing_sun";
     public int                threadCnt = 5;
@@ -31,10 +31,10 @@ public class Settings {
 // as farmers will ; till our flakes well
     // TODO -----------------------------------------------------------
     // certify the middle iterations objects are both cleanly centered
-    // recursivley intake from sub folders/dirs?
+
+    // compute both objects as mother for standard runs
 
     // texture support
-    // compute both objects as mother for standard runs
     // support spinning on multiple axis somehow
 
     // dust bin
