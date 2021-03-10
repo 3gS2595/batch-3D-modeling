@@ -3,6 +3,7 @@ package main.tasks;
 import main.form.Form;
 import main.pool.ThreadPool;
 import org.tinspin.index.qthypercube2.QEntry;
+import org.tinspin.index.qthypercube2.QEntryDist;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +24,7 @@ public class StandardTree implements Task {
 
     @Override
     public void run() {
-        Collection nearestNeighbor = parent[1].KdTree.knnQuery(parent[0].v.get(i), 1);
+        Collection<QEntryDist<Object>> nearestNeighbor = parent[1].KdTree.knnQuery(parent[0].v.get(i), 1);
         double[] closeV = ((QEntry)nearestNeighbor.toArray()[0]).point();
         // nn xyz and distance
         double num =
@@ -41,7 +42,7 @@ public class StandardTree implements Task {
 
         // inserts refreshed point
         pool.offspring.get(offIndex).newPoints.put(i, midpoint);
-        // checks for completion
+        // completion check
         if (pool.offspring.get(offIndex).newPoints.size() == parent[0].v.size()) {
             List<double[]> newV = new ArrayList<>();
             for (int i = 0; i < parent[0].v.size(); i++) {

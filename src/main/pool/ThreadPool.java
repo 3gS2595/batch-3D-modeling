@@ -26,7 +26,7 @@ public class ThreadPool extends Thread{
         //initializes progress bar
         if(this.pb0 == null) {
             System.out.println(parent[0].id + " , " + parent[1].id );
-            double vertCnt = parent[0].v.size() * parent[0].settings.iterations;
+            double vertCnt = parent[0].v.size() * parent[0].settings.iterationCnt;
             this.pb0 = new ProgressBar("producing offspring", (long) vertCnt);
         }
 

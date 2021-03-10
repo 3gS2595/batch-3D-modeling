@@ -7,29 +7,26 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args){
-        System.out.println("-utemporia");
         Main task = new Main();
         task.run(new Settings());
         task.runTime();
     }
     void run(Settings settings){
-        List<Form[]> wells = SetUp.loadWells(settings);
-        settings.groups = wells.size();
+        List<Form[]> groupings = SetUp.loadWells(settings);
+        settings.groups = groupings.size();
         Settings.printSettings(settings);
-        settings.outputFilePath = ObjOutput.createOutputFolder(settings);
 
-        double[] groupStep = {0,0,0};
-        for(Form[] well : wells) {
+        for(Form[] group : groupings) {
             ThreadPool pool = new ThreadPool(settings.threadCnt);
-            for (double i = 0; i < settings.iterations; i++) {
-                Form.step(well);
-                pool.initializeTask(well);
+            for (double i = 0; i < settings.iterationCnt; i++) {
+                Form.step(group);
+                pool.initializeTask(group);
                 pool.run();
-                pool.pb0.setExtraMessage((i + 1) + "/" + settings.iterations);
+                pool.pb0.setExtraMessage((i + 1) + "/" + settings.iterationCnt);
             }
             pool.pb0.close();
-            ObjOutput.output(pool.offspring, groupStep);
-            groupStep[1] = groupStep[1] + 2;
+            ObjOutput.output(pool.offspring);
+            settings.groupStep[1] = settings.groupStep[1] + 2;
         }
     }
 
@@ -38,13 +35,9 @@ public class Main {
     void runTime(){
         long m = ((time() - startTime) / 1000) / 60;
         long s = ((time() - startTime) / 1000) % 60;
-        System.out.format("runtime %d.%dm ", m, s);
+        System.out.format("runtime-%d.%dm", m, s);
     }
 }
-
-
-
-
 
 
 

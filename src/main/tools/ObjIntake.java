@@ -19,11 +19,21 @@ public class ObjIntake {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // conforms pb id lengths
+        int terminalSpacing = 12;
         String loadName;
-        if(form.id.length() >= 15) {
-            loadName = form.id.substring(0, 12) + "..";
-        } else loadName = form.id;
+        if(form.id.length() >= terminalSpacing) {
+            loadName = form.id.substring(0, terminalSpacing) ;
+        } else {
+            loadName = form.id;
+            while (loadName.length() != terminalSpacing) {
+                loadName = loadName.concat(" ");
+            }
+        }
+
         try (ProgressBar pb1 = new ProgressBar(loadName , fileLength)) {
+
                 // OBJ
                 double[] matID = new double[]{0.0, 0.0};
                 BufferedReader reader = new BufferedReader(new FileReader(form.ObjName));

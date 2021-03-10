@@ -15,11 +15,9 @@ public class ObjOutput {
     public static String createOutputFolder(Settings settings){
         String time = (java.time.LocalTime.now() + "").replace(':', '_');
         String date = (java.time.LocalDate.now() + "").replace('-', '_');
-        String dirPath = settings.outputFilePath + "\\"
+        String dirPath = settings.outputFolder + "\\"
                 +   date.substring(5,10) + "_" + date.substring(0,4)+ "__" + time.substring(0, 8)
                 + settings.outputFileNameNotes + "\\";
-        System.out.println("run output- " + dirPath);
-        System.out.println();
         File file = new File(dirPath);
 
         //Creating the directory
@@ -28,7 +26,7 @@ public class ObjOutput {
         else return settings.outputFilePath;
     }
 
-    public static void output(List<Form> outputs, double[] groupStep) {
+    public static void output(List<Form> outputs) {
         try {
             if (outputs.get(0).settings.VertexNormals) outputs.get(0).calculateNormals();
 
@@ -61,7 +59,7 @@ public class ObjOutput {
                     int vs = 0;
                     offspring.standardizeScale();
                     offspring.centerObject();
-                    offspring.translate(groupStep);
+                    offspring.translate(outputs.get(0).settings.groupStep);
                     offspring.translate(seperate);
                     offspring.moved[0] -= retainCorrectMove[0];
 
@@ -105,7 +103,7 @@ public class ObjOutput {
                     writer.write("g objects\n");
 
                     // F
-                    String curMat = "";
+//                    String curMat = "";
                     for (int j = 0; j < offspring.rawf.size(); j++) {
 //                    if (curMat != offspring.rawMats.get(j)){
 //                        curMat = offspring.rawMats.get(j);

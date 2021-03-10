@@ -7,13 +7,13 @@ import main.tasks.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-public class empty implements Task {
+public class template implements Task {
     int i;
     int offIndex;
     ThreadPool pool;
     Form[] parent;
 
-    public empty(int i, int offIndex, ThreadPool pool) {
+    public template(int i, int offIndex, ThreadPool pool) {
         this.i = i;
         this.offIndex = offIndex;
         this.pool = pool;

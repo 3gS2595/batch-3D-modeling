@@ -12,29 +12,35 @@ import static main.tools.ObjIntake.intake;
 
 public class Form {
 
-	public String id;
-	public String ObjName;
+	// foundational object data
+	public String id      = null;
+	public String ObjName = null;
 	public String MtlName = null;
 	public Settings settings;
+	public QuadTreeKD2<Object> KdTree = QuadTreeKD2.create(3);
+	public double[] moved = {0,0,0,0,0,0}; // variable used during moving
 
-	public List<double[]>       v = new ArrayList<>();
-	public List<double[]>      vn = new ArrayList<>();
-	public List<String>      rawf = new ArrayList<>();
-	public List<Material>    mats = new ArrayList<>();
-	public QuadTreeKD2     KdTree = QuadTreeKD2.create(3);
-	public double[]         moved = {0,0,0,0,0,0}; // variable used during moving
+	// file input
+	public List<double[]>     v = new ArrayList<>();
+	public List<double[]>    vn = new ArrayList<>();
+	public List<String>    rawf = new ArrayList<>();
+	public List<Material>  mats = new ArrayList<>();
 
 	// normal averaging
-	public List<double[]>   vnavg = new ArrayList<>();
+	public List<double[]>                         vnavg = new ArrayList<>();
 	public HashMap<Integer,List<Integer>> siblingPoints = new HashMap<>();
 
-	// used in threads
-	public ConcurrentHashMap<Integer, double[]> newPoints = new ConcurrentHashMap<>();
+	// thread coordination
+	public ConcurrentHashMap<Integer, double[]> newPoints  = new ConcurrentHashMap<>();
 	public ConcurrentHashMap<Integer, double[]> usedPoints = new ConcurrentHashMap<>();
 
 	// form sectioning
 	public List<List<double[]>> section = new ArrayList<>();
-	public List<List<double[]>> minMax = new ArrayList<>();
+	public List<List<double[]>> minMax  = new ArrayList<>();
+
+
+
+
 
 	// constructor----------------------------------
 	public Form(String filepath, Settings settings){
@@ -155,6 +161,7 @@ public class Form {
 				tranM[1][2] = -sin;
 				tranM[2][1] = sin;
 				tranM[2][2] = cos;
+				executeRotate(tranM);
 			}
 			if (this.settings.tempRotate[1] > 0) {
 				double theta = Math.toRadians(this.settings.tempRotate[1]);
@@ -164,6 +171,7 @@ public class Form {
 				tranM[0][2] = sin;
 				tranM[2][0] = -sin;
 				tranM[2][2] = cos;
+				executeRotate(tranM);
 			}
 			if (this.settings.tempRotate[2] > 0) {
 				double theta = Math.toRadians(this.settings.tempRotate[2]);
@@ -173,20 +181,23 @@ public class Form {
 				tranM[0][1] = -sin;
 				tranM[1][0] = sin;
 				tranM[1][1] = cos;
-			}
-			for (int i = 0; i < this.v.size(); i++) {
-				double x = this.v.get(i)[0];
-				double y = this.v.get(i)[1];
-				double z = this.v.get(i)[2];
-				double[] prime = new double[3];
-				prime[0] = (x * tranM[0][0]) + (y * tranM[0][1]) + (z * tranM[0][2]) + (1 * tranM[0][3]);
-				prime[1] = (x * tranM[1][0]) + (y * tranM[1][1]) + (z * tranM[1][2]) + (1 * tranM[1][3]);
-				prime[2] = (x * tranM[2][0]) + (y * tranM[2][1]) + (z * tranM[2][2]) + (1 * tranM[2][3]);
-				this.v.set(i, new double[]{prime[0], prime[1], prime[2]});
+				executeRotate(tranM);
 			}
 			this.moved[3] += this.settings.tempRotate[0];
 			this.moved[4] += this.settings.tempRotate[1];
 			this.moved[5] += this.settings.tempRotate[2];
+		}
+	}
+	private void executeRotate(double[][] tranM){
+		for (int i = 0; i < this.v.size(); i++) {
+			double x = this.v.get(i)[0];
+			double y = this.v.get(i)[1];
+			double z = this.v.get(i)[2];
+			double[] prime = new double[3];
+			prime[0] = (x * tranM[0][0]) + (y * tranM[0][1]) + (z * tranM[0][2]) + (1 * tranM[0][3]);
+			prime[1] = (x * tranM[1][0]) + (y * tranM[1][1]) + (z * tranM[1][2]) + (1 * tranM[1][3]);
+			prime[2] = (x * tranM[2][0]) + (y * tranM[2][1]) + (z * tranM[2][2]) + (1 * tranM[2][3]);
+			this.v.set(i, new double[]{prime[0], prime[1], prime[2]});
 		}
 	}
 
