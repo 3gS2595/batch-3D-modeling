@@ -44,7 +44,7 @@ public class RemoveUsedTree implements Task {
                 newV.add(pool.parent[0].newPoints.get(i));
             }
             parent[0].v = new ArrayList<>(newV);
-            pool.offspring.add(parent[0]);
+            pool.output.add(parent[0]);
         }
     }
 }

@@ -31,12 +31,12 @@ public class template implements Task {
 //        pool.offspring.get(offIndex).newPoints.put(i, midpoint);
 
         // checks for completion
-        if (pool.offspring.get(offIndex).newPoints.size() == parent[0].v.size()) {
+        if (pool.output.get(offIndex).newPoints.size() == parent[0].v.size()) {
             List<double[]> newV = new ArrayList<>();
             for (int i = 0; i < parent[0].v.size(); i++) {
-                newV.add(pool.offspring.get(offIndex).newPoints.get(i));
+                newV.add(pool.output.get(offIndex).newPoints.get(i));
             }
-            pool.offspring.get(offIndex).v = new ArrayList<>(newV);
+            pool.output.get(offIndex).v = new ArrayList<>(newV);
         }
     }
 }

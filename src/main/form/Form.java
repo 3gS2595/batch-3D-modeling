@@ -18,7 +18,6 @@ public class Form {
 	public String MtlName = null;
 	public Settings settings;
 	public QuadTreeKD2<Object> KdTree = QuadTreeKD2.create(3);
-	public double[] moved = {0,0,0,0,0,0}; // variable used during moving
 
 	// file input
 	public List<double[]>     v = new ArrayList<>();
@@ -38,6 +37,11 @@ public class Form {
 	public List<List<double[]>> section = new ArrayList<>();
 	public List<List<double[]>> minMax  = new ArrayList<>();
 
+	// record keeping
+	public List<String>       filesUsed = new ArrayList<>();
+	public double[] moved = {0,0,0,0,0,0}; // variable used during moving
+
+
 
 
 
@@ -45,23 +49,31 @@ public class Form {
 	// constructor----------------------------------
 	public Form(String filepath, Settings settings){
 		this.settings = settings;
-		this.ObjName = filepath;
-		this.ObjName = this.ObjName.replace("\\", "/");
+		this.ObjName = filepath.replace("\\", "/");
+
 		String[] nameSplit = ObjName.split("/");
 		this.id = nameSplit[nameSplit.length-1];
+
 		intake(this);
 		if (this.settings.centerObjects) this.centerObject();
 		if (this.settings.standardizeScale) this.standardizeScale();
+
 		this.buildTree();
+		this.filesUsed.add(this.ObjName);
 	}
 
 	// used to make basis for offspring
     public Form(Form form) {
+		this.id = form.id;
+		this.ObjName = form.ObjName;
+		this.MtlName = form.MtlName;
+		this.siblingPoints = form.siblingPoints;
 		this.settings = form.settings;
 		this.v = new ArrayList<>(form.v);
 		this.vn = new ArrayList<>(form.vn);
 		this.rawf = new ArrayList<>(form.rawf);
 		this.buildTree();
+		this.filesUsed = new ArrayList<>(form.filesUsed);
     }
 
     public void buildTree() {
