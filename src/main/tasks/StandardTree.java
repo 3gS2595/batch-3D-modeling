@@ -25,8 +25,10 @@ public class StandardTree implements Task {
     @Override
     public void run() {
         Collection<QEntryDist<Object>> nearestNeighbor = parent[1].KdTree.knnQuery(parent[0].v.get(i), 1);
+        // nn xyz
         double[] closeV = ((QEntry)nearestNeighbor.toArray()[0]).point();
-        // nn xyz and distance
+
+        // distance to nn
         double num =
                 Math.pow((parent[0].v.get(i)[0] - closeV[0]), 2) +
                 Math.pow((parent[0].v.get(i)[1] - closeV[1]), 2) +
@@ -38,7 +40,6 @@ public class StandardTree implements Task {
                 parent[0].v.get(i)[0] + (ratio*(closeV[0] - parent[0].v.get(i)[0])),
                 parent[0].v.get(i)[1] + (ratio*(closeV[1] - parent[0].v.get(i)[1])),
                 parent[0].v.get(i)[2] + (ratio*(closeV[2] - parent[0].v.get(i)[2]))};
-
 
         // inserts refreshed point
         pool.output.get(offIndex).newPoints.put(i, midpoint);

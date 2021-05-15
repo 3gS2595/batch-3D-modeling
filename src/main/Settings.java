@@ -9,59 +9,62 @@ import java.util.List;
 public class Settings {
 
     // hardware
-//    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\heoheastus input\\scans";
-    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\unsorted\\digital\\hephaestus\\input\\small";
-//    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\heoheastus input\\sticks";
-    public String          outputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\hepheastus output";
-    public String   outputFileNameNotes = "blazing_sun";
-    public int                threadCnt = 18;
+//    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\heoheastus input\\cube";
+    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\heoheastus input\\sticks1";
+//    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\heoheastus input\\antenna&fence\\f0-fresh";
+//    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\heoheastus input\\bench5";
+    public String          outputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\hepheastus output\\";
+    public String   outputFileNameNotes = "staining_tongue";
+    public int                threadCnt = 16;
     // routine
-    public boolean             standard = true;     // broken
-    public boolean   removeUsedVertices = false;    // broken
-    public boolean        findBySegment = false;
-    public boolean prioritizeByDistance = false;    // broken
-    public boolean             decimate = true;     // empty
+    public boolean             standard = true;
+    public boolean             decimate = false;       // partly dysfunctional ?
     // render
     public double                 ratio = 0.5;
     public double[]         maxDistance = {0,0,0};    // iteration movement range
-    public double[]            rotation = {0,0,0};    // iteration movement range
-    public int             iterationCnt = 1;
+    public double[]            rotation = {0,350,0};  // iteration movement range
+    public int             iterationCnt = 5;
     public boolean     standardizeScale = true;
     public boolean        centerObjects = true;
+    public boolean       outputUsedObjs = false;      // allows fine-tuning if need be
 
 
 
 // as farmers will ; till these flakes well
     // TODO -----------------------------------------------------------
+// PRIORITIES
+    // migrate SUB-DIVISION to single thread process
+
+    // fix decimate run pre-print summery
+    // parametrically work with tri/quads shouldn't be hard
+    // de-rotate forms on completion (as additional option)
+    // support control over parent choice
+    // ability to recreate placement in blender to use in hopes of raising final quality
+
+// TASK OPTIMIZATIONS/ TWEAKS
+    // support control over parent choice
+    // compute both objects as mother for standard runs
+
+// NEW TASKs
+    // remove used with prioritizing by farthest distance first.
     // generate subdivisions to produce nasty polygon disbursement
+    // standard but limit how many times a point can be used
+    // center object and from the center pont shoot rays through the mother vertex and look
+            // for father vertex in ray path, use this as the nn
 
-    // STEP BY RATIO
+// STEP
+    // allow min and max (start here, end there, rather than end there)
+            // on rotational bounds ( will allow fine tuning runs post initial output)
 
+// GENERAL
+    // texture support
+    // certify the middle iterations objects are both cleanly centered
     // write your own progress bars
 
-    // compute both objects as mother for standard runs
-    // certify the middle iterations objects are both cleanly centered
-    // separate as many tools from tasks as you can ,
-    //      allowing access to a complex toolset when building new routines
-
-    // texture support
-    // merge code with desktop that supports control over parent choice
-    // is it possible to allow a series of tasks to be executed all in the same output run
-
-    // allow min  and max on rotational bounds
-
-    // center object and from the center pont shoot rays through the mother vertex and look
-    // for father vertex in ray path, use this as the nn
-
-    // PRINT OUTPUT SUMMERY WHICH ROUTINES WERE RUN, TOTAL FORMS, TOTAL GROUPS, RUNTIME, LOCATION(LINK?)
-
-    // ALLOW JOBS TO BE RUN IN SUCCESSION
-
-    // de-rotate forms on completion
-
-
-
-
+//OUTPUT
+    // de-rotate forms on completion (as additional option)
+    // output by all permutations of mother,
+            // may overlap and double produce in entirety but will be easier to process
 
 
 
@@ -70,16 +73,21 @@ public class Settings {
 
 
 // dust bin
-    public List<String>           files = new ArrayList<>();
-    public List<Form>             forms = new ArrayList<>();
+    public List<String>           files;
+    public List<Form>             forms;
     public List<Form[]>      workingSet = new ArrayList<>();
     public double[]          tempRotate = {0,0,0}; // variable used during moving might be worth it to test rotate
     public double[]            moveStep = {0,0,0}; // distance each iteration moves
     public double[]           groupStep = {0,0,0};
     public boolean        VertexNormals = false;
     public boolean     avgVertexNormals = false;
-    public int                 groupCnt = 0;
+    public int                 groupCnt;
     public String        outputFilePath = ObjOutput.createOutputFolder(this);
+
+// Current failings
+    public boolean   removeUsedVertices = false;    // broken
+    public boolean        findBySegment = false;
+    public boolean prioritizeByDistance = false;    // broken
 
     public Settings(){
         SetUp setup = new SetUp(this);

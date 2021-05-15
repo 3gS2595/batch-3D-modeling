@@ -13,8 +13,8 @@ import static main.tools.ObjIntake.intake;
 public class Form {
 
 	// foundational object data
-	public String id      = null;
-	public String ObjName = null;
+	public String id;
+	public String ObjName;
 	public String MtlName = null;
 	public Settings settings;
 	public QuadTreeKD2<Object> KdTree = QuadTreeKD2.create(3);
@@ -23,6 +23,7 @@ public class Form {
 	public List<double[]>     v = new ArrayList<>();
 	public List<double[]>    vn = new ArrayList<>();
 	public List<String>    rawf = new ArrayList<>();
+	public List<List<Integer>>f = new ArrayList<>();
 	public List<Material>  mats = new ArrayList<>();
 
 	// normal averaging
@@ -30,8 +31,12 @@ public class Form {
 	public HashMap<Integer,List<Integer>> siblingPoints = new HashMap<>();
 
 	// thread coordination
-	public ConcurrentHashMap<Integer, double[]> newPoints  = new ConcurrentHashMap<>();
-	public ConcurrentHashMap<Integer, double[]> usedPoints = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<Integer, double[]> newV = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<Integer[], Integer> newF = new ConcurrentHashMap<>();
+
+	public ConcurrentHashMap<Integer, double[]> newPoints       = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<Integer, double[]> usedPoints      = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<Integer, double[]> newSubdivisions = new ConcurrentHashMap<>();
 
 	// form sectioning
 	public List<List<double[]>> section = new ArrayList<>();
@@ -72,9 +77,10 @@ public class Form {
 		this.v = new ArrayList<>(form.v);
 		this.vn = new ArrayList<>(form.vn);
 		this.rawf = new ArrayList<>(form.rawf);
-		this.buildTree();
+		this.f = new ArrayList<>(form.f);
 		this.filesUsed = new ArrayList<>(form.filesUsed);
-    }
+		this.buildTree();
+	}
 
     public void buildTree() {
 		for(int i = 0; i < this.v.size(); i++){

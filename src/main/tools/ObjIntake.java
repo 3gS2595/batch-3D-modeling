@@ -73,6 +73,7 @@ public class ObjIntake {
                             for (int i = 1; i < raw.length; i++) {
                                 vIndices.add(Integer.parseInt(raw[i].split(parse)[0]) - 1);
                             }
+                            form.f.add(vIndices);
                             form.rawf.add(line);
 
                             if(form.settings.avgVertexNormals) {
