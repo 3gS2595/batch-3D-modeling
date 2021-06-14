@@ -93,7 +93,7 @@ import java.util.List;
 
 
 
-                    if((averageOne/3) > 0.00025566332731181767) {
+                    if((averageOne/3) > 0.0013943043153174443) {
                         pool.output.get(offIndex).newV.put(offset, midpoint0);
                         pool.output.get(offIndex).newV.put(offset + 1, midpoint1);
                         pool.output.get(offIndex).newV.put(offset + 2, midpoint2);

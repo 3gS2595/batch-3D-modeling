@@ -17,7 +17,6 @@ public class Main {
     void run(Settings settings){
         ThreadPool pool = new ThreadPool(settings);
         runSingl(pool);
-        runSingl(pool);
         runGroup(pool);
         pool.writeInfoFile();
     }
@@ -78,6 +77,9 @@ public class Main {
                 String filesUsed = "";
                 for (String file : group[0].filesUsed) filesUsed = filesUsed.concat(", " + file);
                 System.out.println("_r" + runCnt + " " + filesUsed);
+//                for (Form cur : group){
+//                    cur.buildTree();
+//                }
 
                 // pb declare
                 double vertCnt = group[0].v.size() * group[0].settings.iterationCnt;

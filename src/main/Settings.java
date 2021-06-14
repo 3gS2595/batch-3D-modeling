@@ -8,11 +8,15 @@ import java.util.List;
 
 public class Settings {
 
+
     // hardware
 //    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\heoheastus input\\cube";
-    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\heoheastus input\\sticks1";
+    public String           inputFolder = "C:\\Users\\lucoius\\Pictures\\photogrammetry\\unsorted\\testrun";
+//    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\heoheastus input\\sticks1";
 //    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\heoheastus input\\antenna&fence\\f0-fresh";
-//    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\heoheastus input\\bench5";
+//    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\heoheastus input\\bench5\\2";
+
+
     public String          outputFolder = "C:\\Users\\lucoius\\Documents\\virtual_studio\\hepheastus\\hepheastus output\\";
     public String   outputFileNameNotes = "staining_tongue";
     public int                threadCnt = 16;
@@ -33,8 +37,6 @@ public class Settings {
 // as farmers will ; till these flakes well
     // TODO -----------------------------------------------------------
 // PRIORITIES
-    // migrate SUB-DIVISION to single thread process
-
     // fix decimate run pre-print summery
     // parametrically work with tri/quads shouldn't be hard
     // de-rotate forms on completion (as additional option)
@@ -45,7 +47,7 @@ public class Settings {
     // support control over parent choice
     // compute both objects as mother for standard runs
 
-// NEW TASKs
+// NEW TASKS
     // remove used with prioritizing by farthest distance first.
     // generate subdivisions to produce nasty polygon disbursement
     // standard but limit how many times a point can be used
