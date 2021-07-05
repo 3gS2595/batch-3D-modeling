@@ -42,36 +42,36 @@ public class SetUp {
         HashMap<String, String> entryCheck = new HashMap<>();
         // builds run sets in either singles or groups
         List<Form[]> wellsprings = new ArrayList<>();
-        for(int i = 0; i < setting.forms.size(); i++) {
-            for (int j = 0; j < setting.forms.size(); j++) {
-                String check = setting.forms.get(i).id.concat(setting.forms.get(j).id);
-                if(!setting.forms.get(i).id.equals(setting.forms.get(j).id) && !entryCheck.containsKey(check)) {
-                    String check0 = setting.forms.get(i).id.concat(setting.forms.get(j).id);
-                    String check1 = setting.forms.get(j).id.concat(setting.forms.get(i).id);
+        for(int i = 0; i < setting.wellsprings.size(); i++) {
+            for (int j = 0; j < setting.wellsprings.size(); j++) {
+                String check = setting.wellsprings.get(i).id.concat(setting.wellsprings.get(j).id);
+                if(!setting.wellsprings.get(i).id.equals(setting.wellsprings.get(j).id) && !entryCheck.containsKey(check)) {
+                    String check0 = setting.wellsprings.get(i).id.concat(setting.wellsprings.get(j).id);
+                    String check1 = setting.wellsprings.get(j).id.concat(setting.wellsprings.get(i).id);
                     entryCheck.put(check0,"0");
                     entryCheck.put(check1,"1");
-                    Form file0 = new Form(setting.forms.get(i));
-                    Form file1 = new Form(setting.forms.get(j));
+                    Form file0 = new Form(setting.wellsprings.get(i));
+                    Form file1 = new Form(setting.wellsprings.get(j));
                     file0.filesUsed = new ArrayList<>();
                     file1.filesUsed = new ArrayList<>();
 
                     // [0] = mother , donates polygons
                     Form[] wellSpring = new Form[]{null, null};
                     if (file0.v.size() > file1.v.size()) {
-                        file0.filesUsed.add(setting.forms.get(j).id);
-                        file0.filesUsed.add(setting.forms.get(i).id);
+                        file0.filesUsed.add(setting.wellsprings.get(j).id);
+                        file0.filesUsed.add(setting.wellsprings.get(i).id);
                         wellSpring[0] = file0;
-                        file1.filesUsed.add(setting.forms.get(j).id);
-                        file1.filesUsed.add(setting.forms.get(i).id);
+                        file1.filesUsed.add(setting.wellsprings.get(j).id);
+                        file1.filesUsed.add(setting.wellsprings.get(i).id);
                         wellSpring[1] = file1;
 
                     }
                     else {
-                        file1.filesUsed.add(setting.forms.get(i).id);
-                        file1.filesUsed.add(setting.forms.get(j).id);
+                        file1.filesUsed.add(setting.wellsprings.get(i).id);
+                        file1.filesUsed.add(setting.wellsprings.get(j).id);
                         wellSpring[0] = file1;
-                        file0.filesUsed.add(setting.forms.get(i).id);
-                        file0.filesUsed.add(setting.forms.get(j).id);
+                        file0.filesUsed.add(setting.wellsprings.get(i).id);
+                        file0.filesUsed.add(setting.wellsprings.get(j).id);
                         wellSpring[1] = file0;
                     }
 

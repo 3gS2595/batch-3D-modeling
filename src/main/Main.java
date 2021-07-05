@@ -27,12 +27,12 @@ public class Main {
             Settings.printSettings(pool.setting);
             // pb declare
             double vertCnt = 0;
-            for (Form form : pool.setting.forms) vertCnt+=form.f.size();
+            for (Form form : pool.setting.wellsprings) vertCnt+=form.f.size();
             try (ProgressBar prod = new ProgressBar(" producing offspring"+ runCnt, (long) vertCnt);
-                 ProgressBar save = new ProgressBar("", pool.setting.forms.size())) {
+                 ProgressBar save = new ProgressBar("", pool.setting.wellsprings.size())) {
                 prod.setExtraMessage((1) + "/" + pool.setting.iterationCnt);
 
-                for (Form form : pool.setting.forms) {
+                for (Form form : pool.setting.wellsprings) {
                     String filesUsed = "";
                     for (String file : form.filesUsed) filesUsed = filesUsed.concat(", " + file);
                     pool.initializeTaskSingle(form);
@@ -56,7 +56,7 @@ public class Main {
                     }
                 }
                 ObjOutput.output(pool, save, runCnt);
-                pool.setting.forms = new ArrayList<>(pool.output);
+                pool.setting.wellsprings = new ArrayList<>(pool.output);
                 pool.output.clear();
                 pool.setting.workingSet.clear();
                 pool.setting.groupStep[1] = pool.setting.groupStep[1] + 2;
@@ -73,24 +73,24 @@ public class Main {
             Settings.printSettings(pool.setting);
 
             // pair iterate
-            for (Form[] group : pool.setting.workingSet) {
+            for (Form[] springPair : pool.setting.workingSet) {
                 String filesUsed = "";
-                for (String file : group[0].filesUsed) filesUsed = filesUsed.concat(", " + file);
+                for (String file : springPair[0].filesUsed) filesUsed = filesUsed.concat(", " + file);
                 System.out.println("_r" + runCnt + " " + filesUsed);
 //                for (Form cur : group){
 //                    cur.buildTree();
 //                }
 
                 // pb declare
-                double vertCnt = group[0].v.size() * group[0].settings.iterationCnt;
+                double vertCnt = springPair[0].v.size() * springPair[0].settings.iterationCnt;
                 try (ProgressBar prod = new ProgressBar(" " + runCnt + " producing offspring", (long) vertCnt);
                      ProgressBar save = new ProgressBar(" " + runCnt, pool.setting.iterationCnt)) {
                     prod.setExtraMessage((1) + "/" + pool.setting.iterationCnt);
 
                     // command run
                     for (double i = 0; i < pool.setting.iterationCnt; i++) {
-                        Form.step(group);
-                        pool.initializeTaskGroup(group);
+                        Form.step(springPair);
+                        pool.initializeTaskGroup(springPair);
                         pool.run(prod);
                     }
                     ObjOutput.output(pool, save, runCnt);

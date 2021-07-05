@@ -85,7 +85,7 @@ public class Settings {
 
 // dust bin
     public List<String>           files;
-    public List<Form>             forms;
+    public List<Form> wellsprings;
     public List<Form[]>      workingSet = new ArrayList<>();
     public double[]          tempRotate = {0,0,0}; // variable used during moving might be worth it to test rotate
     public double[]            moveStep = {0,0,0}; // distance each iteration moves
@@ -103,9 +103,9 @@ public class Settings {
     public Settings(){
         optionSelection();
         SetUp setup = new SetUp(this);
-        this.forms = setup.singles;
+        this.wellsprings = setup.singles;
         this.files = setup.files;
-        this.groupCnt = this.forms.size();
+        this.groupCnt = this.wellsprings.size();
     }
 
     // could output single run into working set, and then use that as input to get (grouped) working set
