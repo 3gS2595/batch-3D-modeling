@@ -1,7 +1,8 @@
-package main.tasks;
+package main.tasks.other;
 
 import main.form.Form;
 import main.pool.ThreadPool;
+import main.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ public class FindBySegment implements Task {
     public FindBySegment(int i, ThreadPool pool) {
         this.i = i;
         this.pool = pool;
-        this.parent = this.pool.parent;
+        this.parent = this.pool.pairSpring;
     }
 
     @Override
@@ -67,13 +68,13 @@ public class FindBySegment implements Task {
         double y = parent[0].v.get(i)[1] + (distance * (parent[1].section.get(sectionIndex).get(recordIndex)[1] - parent[0].v.get(i)[1]));
         double z = parent[0].v.get(i)[2] + (distance * (parent[1].section.get(sectionIndex).get(recordIndex)[2] - parent[0].v.get(i)[2]));
         double[] midpoint = {x, y, z};
-        pool.parent[0].newPoints.put(i, midpoint);
+        pool.pairSpring[0].newPoints.put(i, midpoint);
 
         synchronized (this) {
             if (parent[0].newPoints.size() == parent[0].v.size()) {
                 List<double[]> newV = new ArrayList<>();
                 for (int i = 0; i < parent[0].v.size(); i++) {
-                    newV.add(pool.parent[0].newPoints.get(i));
+                    newV.add(pool.pairSpring[0].newPoints.get(i));
                 }
                 parent[0].v = new ArrayList<>(newV);
                 pool.output.add(parent[0]);

@@ -67,7 +67,7 @@ public class Main {
     }
 
     void runGroup(ThreadPool pool){
-        if(pool.setting.standard) {
+        if(pool.setting.nearestVertice || pool.setting.nearestSurface) {
             int runCnt = 1;
             pool.setting.group();
             Settings.printSettings(pool.setting);

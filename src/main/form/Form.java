@@ -27,8 +27,9 @@ public class Form {
 	public List<Material>  mats = new ArrayList<>();
 
 	// normal averaging
-	public List<double[]>                         vnavg = new ArrayList<>();
+	public List<double[]> 						  vNavg = new ArrayList<>();
 	public HashMap<Integer,List<Integer>> siblingPoints = new HashMap<>();
+	public HashMap<Integer,List<List<Integer>>> siblingPolys = new HashMap<>();
 
 	// thread coordination
 	public ConcurrentHashMap<Integer, double[]> newV = new ConcurrentHashMap<>();
@@ -36,7 +37,6 @@ public class Form {
 
 	public ConcurrentHashMap<Integer, double[]> newPoints       = new ConcurrentHashMap<>();
 	public ConcurrentHashMap<Integer, double[]> usedPoints      = new ConcurrentHashMap<>();
-	public ConcurrentHashMap<Integer, double[]> newSubdivisions = new ConcurrentHashMap<>();
 
 	// form sectioning
 	public List<List<double[]>> section = new ArrayList<>();
@@ -79,7 +79,9 @@ public class Form {
 		this.rawf = new ArrayList<>(form.rawf);
 		this.f = new ArrayList<>(form.f);
 		this.filesUsed = new ArrayList<>(form.filesUsed);
-		this.buildTree();
+		this.KdTree = form.KdTree;
+		this.siblingPolys = form.siblingPolys;
+		this.moved = form.moved;
 	}
 
     public void buildTree() {
@@ -119,8 +121,7 @@ public class Form {
 		double distance = Math.sqrt(num);
 		double scaleMult = 1 / distance;
 		for (int i = 0; i < this.v.size(); i++) {
-			double[] corrected = {this.v.get(i)[0] * scaleMult, this.v.get(i)[1] * scaleMult, this.v.get(i)[2] * scaleMult};
-			v.set(i, corrected);
+			v.set(i, new double[]{this.v.get(i)[0] * scaleMult, this.v.get(i)[1] * scaleMult, this.v.get(i)[2] * scaleMult});
 		}
 	}
 
@@ -204,6 +205,7 @@ public class Form {
 			this.moved[3] += this.settings.tempRotate[0];
 			this.moved[4] += this.settings.tempRotate[1];
 			this.moved[5] += this.settings.tempRotate[2];
+			System.out.println(this.moved[3]);
 		}
 	}
 	private void executeRotate(double[][] tranM){
@@ -260,7 +262,7 @@ public class Form {
 
 		// averages
 		if(this.settings.avgVertexNormals) {
-			this.vnavg = new ArrayList<>(this.vn);
+			this.vNavg = new ArrayList<>(this.vn);
 			for (Integer key : this.siblingPoints.keySet()) {
 				List<Integer> t = this.siblingPoints.get(key);
 				int cnt = 0;
@@ -277,10 +279,10 @@ public class Form {
 
 				double length = Math.sqrt(build[0] * build[0] + build[1] * build[1] + build[2] * build[2]);
 				double[] vnNormal = {build[0] / length, build[1] / length, build[2] / length};
-				this.vnavg.set(key, vnNormal);
+				this.vNavg.set(key, vnNormal);
 			}
 
-			this.vn = new ArrayList<>(this.vnavg);
+			this.vn = new ArrayList<>(this.vNavg);
 		}
 	}
 

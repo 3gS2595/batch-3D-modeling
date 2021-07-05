@@ -14,12 +14,11 @@ import java.util.List;
 public class ObjOutput {
     private static final DecimalFormat df = new DecimalFormat("#############0.00000000000000");
     public static String createOutputFolder(Settings settings){
-        System.out.println("hello");
         String time = (java.time.LocalTime.now() + "").replace(':', '_');
         String date = (java.time.LocalDate.now() + "").replace('-', '_');
-        String dirPath = settings.outputFolder + "\\"
+        String dirPath = settings.outputFolder + "/"
                 +   date.substring(5,10) + "_" + date.substring(0,4)+ "__" + time.substring(0, 8)
-                + settings.outputFileNameNotes + "\\";
+                + settings.outputFileNameNotes + "/";
         File file = new File(dirPath);
 
         //Creating the directory
@@ -178,6 +177,5 @@ public class ObjOutput {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }

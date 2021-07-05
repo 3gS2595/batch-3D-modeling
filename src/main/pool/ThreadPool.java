@@ -3,6 +3,9 @@ package main.pool;
 import main.Settings;
 import main.form.Form;
 import main.tasks.*;
+import main.tasks.other.FindBySegment;
+import main.tasks.other.PrioritizeDistance;
+import main.tasks.other.RemoveUsedTree;
 import me.tongfei.progressbar.ProgressBar;
 
 import java.io.File;
@@ -14,7 +17,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class ThreadPool extends Thread{
     public Settings setting;
-    public Form[] parent;
+    public Form[] pairSpring;
     public List<Form> output = new ArrayList<>();
     public List<String> logText = new ArrayList<>();
 
@@ -43,40 +46,33 @@ public class ThreadPool extends Thread{
         }
     }
 
-
     public void initializeTaskSingle(Form parent) {
-        this.parent = new Form[]{parent};
+        this.pairSpring = new Form[]{parent};
         this.output.add(new Form(parent));
         int offIndex = this.output.size()-1;
 
         if (this.output.get(offIndex).settings.decimate) {
-
-            // copies v into new v
+            // copies v into newV
             for(int i = 0; i < this.output.get(offIndex).v.size(); i++){
                 this.output.get(offIndex).newV.put(i, this.output.get(offIndex).v.get(i));
             }
-
-            execute(new DecimateSingleThread(offIndex, this));
-            // sends index for newly created vertices stepping by 3
-            // allowing 3 new points without thread collision
-//            int offset = this.output.get(offIndex).newV.size();
-//            for(int i = 0, j = this.output.get(offIndex).f.size(); i < j; i++) {
-//                execute(new Decimate(i, offset, offIndex, this));
-//                offset+=3;
-//            }
+            execute(new Decimate(offIndex, this));
         }
     }
 
     public void initializeTaskGroup(Form[] parent) {
-        this.parent = parent;
+        this.pairSpring = parent;
         this.output.add(new Form(parent[0]));
         int offIndex = this.output.size()-1;
 
         // vertex' task creationX
         for(int i = 0, j = this.output.get(this.output.size()-1).v.size(); i < j; i++) {
 
-            if (this.output.get(offIndex).settings.standard) {
-                execute(new StandardTree(i, offIndex, this));
+            if (this.output.get(offIndex).settings.nearestVertice) {
+                execute(new Standard(i, offIndex, this));
+            }
+            else if (this.output.get(offIndex).settings.nearestSurface) {
+                execute(new NearestSurface(i, offIndex, this));
             }
             else if (this.output.get(offIndex).settings.removeUsedVertices) {
                 execute(new RemoveUsedTree(i, this));
@@ -85,8 +81,8 @@ public class ThreadPool extends Thread{
                 execute(new PrioritizeDistance(i, this));
             }
             else if (this.output.get(offIndex).settings.findBySegment) {
-                this.parent[0].split();
-                this.parent[1].split();
+                this.pairSpring[0].split();
+                this.pairSpring[1].split();
                 execute(new FindBySegment(i, this));
             }
         }

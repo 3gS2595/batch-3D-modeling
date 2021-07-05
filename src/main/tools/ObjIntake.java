@@ -20,7 +20,7 @@ public class ObjIntake {
             e.printStackTrace();
         }
 
-        // conforms pb id lengths
+        // truncates pb id text length
         int terminalSpacing = 12;
         String loadName;
         if(form.id.length() >= terminalSpacing) {
@@ -62,9 +62,6 @@ public class ObjIntake {
                             form.v.add(new double[]{num[1], num[2], num[3], matID[0]});
                             break;
 
-//                        case "vn":
-//                            break;
-
                         case "f":
                             // decides what obj uses as parser than parses
                             List<Integer> vIndices = new ArrayList<>();
@@ -76,22 +73,46 @@ public class ObjIntake {
                             form.f.add(vIndices);
                             form.rawf.add(line);
 
+                            // populates vertex sibling points 'siblingPoints'
+                            if(form.settings.nearestSurface) {
+                                for(int vertexIndex : vIndices) {
+                                    if (!form.siblingPolys.containsKey(vertexIndex)) {
+                                        List<List<Integer>> t = new ArrayList<>();
+                                        t.add(vIndices);
+                                        if(vertexIndex == -1){
+                                            System.out.println("WAIT");
+                                            System.exit(1);
+                                        }
+                                        form.siblingPolys.put(vertexIndex, t);
+                                    } else if (form.siblingPolys.containsKey(vertexIndex)) {
+                                        List<List<Integer>> t = form.siblingPolys.get(vertexIndex);
+                                        t.add(vIndices);
+                                        if(vertexIndex == -1){
+                                            System.out.println("WAIT");
+                                            System.exit(1);
+                                        }
+                                        form.siblingPolys.put(vertexIndex, t);
+                                    }
+                                }
+                            }
+
+                            // populates vertex sibling points 'siblingPoints'
                             if(form.settings.avgVertexNormals) {
-                                for(int vertex : vIndices) {
-                                    if (!form.siblingPoints.containsKey(vertex)) {
+                                for(int vertexIndex : vIndices) {
+                                    if (!form.siblingPoints.containsKey(vertexIndex)) {
                                         List<Integer> t = new ArrayList<>();
                                         for(int sibling: vIndices) {
-                                            if(sibling != vertex)
+                                            if(sibling != vertexIndex)
                                             t.add(sibling);
                                         }
-                                        form.siblingPoints.put(vertex, t);
-                                    } else if (form.siblingPoints.containsKey(vertex)) {
-                                        List<Integer> t = form.siblingPoints.get(vertex);
+                                        form.siblingPoints.put(vertexIndex, t);
+                                    } else if (form.siblingPoints.containsKey(vertexIndex)) {
+                                        List<Integer> t = form.siblingPoints.get(vertexIndex);
                                         for(int sibling: vIndices) {
-                                            if(sibling != vertex)
+                                            if(sibling != vertexIndex)
                                                 t.add(sibling);
                                         }
-                                        form.siblingPoints.put(vertex, t);
+                                        form.siblingPoints.put(vertexIndex, t);
                                     }
                                 }
                             }

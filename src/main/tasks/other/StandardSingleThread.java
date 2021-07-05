@@ -7,15 +7,15 @@ import main.tasks.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Standard implements Task {
+public class StandardSingleThread implements Task {
     int i;
     ThreadPool pool;
     Form[] parent;
 
-    public Standard(int i, ThreadPool pool) {
+    public StandardSingleThread(int i, ThreadPool pool) {
         this.i = i;
         this.pool = pool;
-        this.parent = pool.parent;
+        this.parent = pool.pairSpring;
     }
 
     @Override
@@ -42,13 +42,13 @@ public class Standard implements Task {
             double z = parent[0].v.get(i)[2] + (distance*(parent[1].v.get(recordIndex)[2] - parent[0].v.get(i)[2]));
 
             double[] midpoint = {x,y,z};
-            pool.parent[0].newPoints.put(i, midpoint);
+            pool.pairSpring[0].newPoints.put(i, midpoint);
         }
         synchronized(this) {
             if (parent[0].newPoints.size() == parent[0].v.size()) {
                 List<double[]> newV = new ArrayList<>();
                 for (int i = 0; i < parent[0].v.size(); i++) {
-                    newV.add(pool.parent[0].newPoints.get(i));
+                    newV.add(pool.pairSpring[0].newPoints.get(i));
                 }
                 parent[0].v = new ArrayList<>(newV);
                 pool.output.add(parent[0]);

@@ -15,44 +15,44 @@ public class RemoveUsed implements Task {
     public RemoveUsed(int i, ThreadPool pool) {
         this.i = i;
         this.pool = pool;
-        this.parent = pool.parent;
+        this.parent = pool.pairSpring;
     }
 
     @Override
     public void run() {
-        if(pool.parent[0].newPoints.size() < pool.parent[0].v.size()) {
+        if(pool.pairSpring[0].newPoints.size() < pool.pairSpring[0].v.size()) {
         double record = Double.MAX_VALUE;
         int recordIndex = -1;
-        for (int j = 0; j < pool.parent[1].v.size(); j++) {
+        for (int j = 0; j < pool.pairSpring[1].v.size(); j++) {
             double num =
-                    Math.pow((pool.parent[0].v.get(i)[0] - pool.parent[1].v.get(j)[0]), 2)
-                            + Math.pow((pool.parent[0].v.get(i)[1] - pool.parent[1].v.get(j)[1]), 2)
-                            + Math.pow((pool.parent[0].v.get(i)[2] - pool.parent[1].v.get(j)[2]), 2);
+                    Math.pow((pool.pairSpring[0].v.get(i)[0] - pool.pairSpring[1].v.get(j)[0]), 2)
+                            + Math.pow((pool.pairSpring[0].v.get(i)[1] - pool.pairSpring[1].v.get(j)[1]), 2)
+                            + Math.pow((pool.pairSpring[0].v.get(i)[2] - pool.pairSpring[1].v.get(j)[2]), 2);
             double distance = Math.sqrt(num);
-            if ((distance < record) && !(pool.parent[0].usedPoints.containsKey(j))) {
+            if ((distance < record) && !(pool.pairSpring[0].usedPoints.containsKey(j))) {
                 record = distance;
                 recordIndex = j;
             }
         }
-        double distance = (pool.parent[0].settings.ratio * record)/record;
-        double x = pool.parent[0].v.get(i)[0] + (distance*(pool.parent[1].v.get(recordIndex)[0] - pool.parent[0].v.get(i)[0]));
-        double y = pool.parent[0].v.get(i)[1] + (distance*(pool.parent[1].v.get(recordIndex)[1] - pool.parent[0].v.get(i)[1]));
-        double z = pool.parent[0].v.get(i)[2] + (distance*(pool.parent[1].v.get(recordIndex)[2] - pool.parent[0].v.get(i)[2]));
+        double distance = (pool.pairSpring[0].settings.ratio * record)/record;
+        double x = pool.pairSpring[0].v.get(i)[0] + (distance*(pool.pairSpring[1].v.get(recordIndex)[0] - pool.pairSpring[0].v.get(i)[0]));
+        double y = pool.pairSpring[0].v.get(i)[1] + (distance*(pool.pairSpring[1].v.get(recordIndex)[1] - pool.pairSpring[0].v.get(i)[1]));
+        double z = pool.pairSpring[0].v.get(i)[2] + (distance*(pool.pairSpring[1].v.get(recordIndex)[2] - pool.pairSpring[0].v.get(i)[2]));
 
         double[] midpoint = {x,y,z};
-        pool.parent[0].newPoints.put(i, midpoint);
-        pool.parent[0].usedPoints.put(recordIndex,new double[]{6,9});
+        pool.pairSpring[0].newPoints.put(i, midpoint);
+        pool.pairSpring[0].usedPoints.put(recordIndex,new double[]{6,9});
 
         }
-        if (pool.parent[0].newPoints.size() == pool.parent[0].v.size()) {
+        if (pool.pairSpring[0].newPoints.size() == pool.pairSpring[0].v.size()) {
             List<double[]> newV = new ArrayList<>();
-            for (int i = 0; i < pool.parent[0].v.size(); i++) {
-                newV.add(pool.parent[0].newPoints.get(i));
+            for (int i = 0; i < pool.pairSpring[0].v.size(); i++) {
+                newV.add(pool.pairSpring[0].newPoints.get(i));
             }
-            pool.parent[0].v = new ArrayList<>(newV);
+            pool.pairSpring[0].v = new ArrayList<>(newV);
             pool.output.add(parent[0]);
-        } else if (pool.parent[0].newPoints.size() > pool.parent[0].v.size()) {
-            System.out.println(pool.parent[0].newPoints.size());
+        } else if (pool.pairSpring[0].newPoints.size() > pool.pairSpring[0].v.size()) {
+            System.out.println(pool.pairSpring[0].newPoints.size());
         }
     }
 }
