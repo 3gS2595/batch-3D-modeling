@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class Settings {
 
     // hardware
-    public String           inputFolder = "/home/trinkner/Desktop/camp/Documents/hepheastus/input/test/";
+    public String           inputFolder = "/home/trinkner/Documents/hepheastus/input/sticks/";
     public String          outputFolder = "/home/trinkner/Documents/hepheastus/output/";
     public String   outputFileNameNotes = "staining_tongue";
     public int                threadCnt = 19;

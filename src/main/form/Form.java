@@ -38,10 +38,6 @@ public class Form {
 	public ConcurrentHashMap<Integer, double[]> newPoints       = new ConcurrentHashMap<>();
 	public ConcurrentHashMap<Integer, double[]> usedPoints      = new ConcurrentHashMap<>();
 
-	// form sectioning
-	public List<List<double[]>> section = new ArrayList<>();
-	public List<List<double[]>> minMax  = new ArrayList<>();
-
 	// record keeping
 	public List<String>       filesUsed = new ArrayList<>();
 	public double[] moved = {0,0,0,0,0,0}; // variable used during moving
@@ -205,7 +201,6 @@ public class Form {
 			this.moved[3] += this.settings.tempRotate[0];
 			this.moved[4] += this.settings.tempRotate[1];
 			this.moved[5] += this.settings.tempRotate[2];
-			System.out.println(this.moved[3]);
 		}
 	}
 	private void executeRotate(double[][] tranM){
@@ -283,67 +278,6 @@ public class Form {
 			}
 
 			this.vn = new ArrayList<>(this.vNavg);
-		}
-	}
-
-	public void split(){
-		double[] max = this.v.get(1).clone();
-		double[] min = this.v.get(1).clone();
-
-		for (double[] doubles : this.v) {
-			double[] vert = doubles.clone();
-			// loops xyz
-			for (int j = 0; j < 3; j++) {
-				if (vert[j] > max[j]) {
-					max[j] = vert[j];
-				}
-				if (vert[j] < min[j]) {
-					min[j] = vert[j];
-				}
-			}
-		}
-		double[] haf = {min[0] + (max[0] - min[0])/2, min[1] + (max[1] - min[1])/2, min[2] + (max[2] - min[2])/2};
-		List<double[]> minXyz = new ArrayList<>();
-		List<double[]> maxXyz = new ArrayList<>();
-		minXyz.add(new double[]{min[0], min[1], min[2]});
-		maxXyz.add(new double[]{haf[0], haf[1], haf[2]});
-
-		minXyz.add(new double[]{min[0], min[1], haf[2]});
-		maxXyz.add(new double[]{haf[0], haf[1], max[2]});
-
-		minXyz.add(new double[]{min[0], haf[1], haf[2]});
-		maxXyz.add(new double[]{haf[0], max[1], max[2]});
-
-		minXyz.add(new double[]{haf[0], haf[1], haf[2]});
-		maxXyz.add(new double[]{max[0], max[1], max[2]});
-
-		minXyz.add(new double[]{haf[0], min[1], min[2]});
-		maxXyz.add(new double[]{max[0], haf[1], haf[2]});
-
-		minXyz.add(new double[]{min[0], haf[1], min[2]});
-		maxXyz.add(new double[]{haf[0], max[1], haf[2]});
-
-		minXyz.add(new double[]{haf[0], min[1], haf[2]});
-		maxXyz.add(new double[]{max[0], haf[1], max[2]});
-
-		minXyz.add(new double[]{haf[0], haf[1], min[2]});
-		maxXyz.add(new double[]{max[0], max[1], haf[2]});
-
-		minMax.add(minXyz);
-		minMax.add(maxXyz);
-		for (int j = 0; j < 8; j++) {
-			this.section.add(new ArrayList<>());
-		}
-		for (double[] point : this.v) {
-			for (int j = 0; j < 8; j++) {
-				if (
-						minXyz.get(j)[0] <= point[0] && point[0] <= maxXyz.get(j)[0] &&
-								minXyz.get(j)[1] <= point[1] && point[1] <= maxXyz.get(j)[1] &&
-								minXyz.get(j)[2] <= point[2] && point[2] <= maxXyz.get(j)[2]
-				) {
-					this.section.get(j).add(point);
-				}
-			}
 		}
 	}
 }

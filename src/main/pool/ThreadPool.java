@@ -3,7 +3,6 @@ package main.pool;
 import main.Settings;
 import main.form.Form;
 import main.tasks.*;
-import main.tasks.other.FindBySegment;
 import main.tasks.other.PrioritizeDistance;
 import main.tasks.other.RemoveUsedTree;
 import me.tongfei.progressbar.ProgressBar;
@@ -80,11 +79,11 @@ public class ThreadPool extends Thread{
             else if (this.output.get(offIndex).settings.prioritizeByDistance) {
                 execute(new PrioritizeDistance(i, this));
             }
-            else if (this.output.get(offIndex).settings.findBySegment) {
-                this.pairSpring[0].split();
-                this.pairSpring[1].split();
-                execute(new FindBySegment(i, this));
-            }
+//            else if (this.output.get(offIndex).settings.findBySegment) {
+//                this.pairSpring[0].split();
+//                this.pairSpring[1].split();
+//                execute(new FindBySegment(i, this));
+//            }
         }
     }
 
