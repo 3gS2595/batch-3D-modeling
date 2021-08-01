@@ -66,24 +66,17 @@ public class ThreadPool extends Thread{
 
         // vertex' task creationX
         for(int i = 0, j = this.output.get(this.output.size()-1).v.size(); i < j; i++) {
-
-            if (this.output.get(offIndex).settings.nearestVertice) {
+            if (this.output.get(offIndex).settings.nearestVertice)
                 execute(new Standard(i, offIndex, this));
-            }
-            else if (this.output.get(offIndex).settings.nearestSurface) {
+
+            else if (this.output.get(offIndex).settings.nearestSurface)
                 execute(new NearestSurface(i, offIndex, this));
-            }
-            else if (this.output.get(offIndex).settings.removeUsedVertices) {
+
+            else if (this.output.get(offIndex).settings.removeUsedVertices)
                 execute(new RemoveUsedTree(i, this));
-            }
-            else if (this.output.get(offIndex).settings.prioritizeByDistance) {
+
+            else if (this.output.get(offIndex).settings.prioritizeByDistance)
                 execute(new PrioritizeDistance(i, this));
-            }
-//            else if (this.output.get(offIndex).settings.findBySegment) {
-//                this.pairSpring[0].split();
-//                this.pairSpring[1].split();
-//                execute(new FindBySegment(i, this));
-//            }
         }
     }
 

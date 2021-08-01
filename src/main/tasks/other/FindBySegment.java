@@ -7,6 +7,14 @@ import main.tasks.Task;
 import java.util.ArrayList;
 import java.util.List;
 
+// this goes in thread pool call
+//            else if (this.output.get(offIndex).settings.findBySegment) {
+//                this.pairSpring[0].split();
+//                this.pairSpring[1].split();
+//                execute(new FindBySegment(i, this));
+//            }
+
+
 //public class FindBySegment implements Task {
 //    int i;
 //    ThreadPool pool;

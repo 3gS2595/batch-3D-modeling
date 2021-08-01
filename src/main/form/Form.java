@@ -45,8 +45,6 @@ public class Form {
 
 
 
-
-
 	// constructor----------------------------------
 	public Form(String filepath, Settings settings){
 		this.settings = settings;
@@ -64,7 +62,7 @@ public class Form {
 	}
 
 	// used to make basis for offspring
-    public Form(Form form) {
+	public Form(Form form) {
 		this.id = form.id;
 		this.ObjName = form.ObjName;
 		this.MtlName = form.MtlName;
@@ -80,7 +78,7 @@ public class Form {
 		this.moved = form.moved;
 	}
 
-    public void buildTree() {
+	public void buildTree() {
 		for(int i = 0; i < this.v.size(); i++){
 			this.KdTree.insert(new double[]{this.v.get(i)[0], this.v.get(i)[1], this.v.get(i)[2]}, i);
 		}

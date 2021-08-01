@@ -10,21 +10,22 @@ import java.util.Scanner;
 public class Settings {
 
     // hardware
-    public String           inputFolder = "/home/trinkner/Documents/hepheastus/input/sticks/";
-    public String          outputFolder = "/home/trinkner/Documents/hepheastus/output/";
+    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\virtual_studio\\e00\\r01";
+    public String          outputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\raw\\output";
     public String   outputFileNameNotes = "staining_tongue";
     public int                threadCnt = 19;
     // routine
     public boolean             decimate = false;       // todo partly dysfunctional ?
 
     public boolean       nearestVertice = false;
-    public boolean       nearestSurface = false; public int subDivRecursionLvl = 3;
+    public boolean       nearestSurface = false;
+              public int subDivRecursionLvl = 3;
 
     // render
-    public double                 ratio = .5;
+    public double                 ratio = .32;
     public double[]         maxDistance = {0,0,0};
-    public double[]            rotation = {0,360,0};
-    public int             iterationCnt = 5;
+    public double[]            rotation = {0,360,50};
+    public int             iterationCnt = 10;
     public boolean     standardizeScale = true;
     public boolean        centerObjects = true;
 
