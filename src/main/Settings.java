@@ -10,27 +10,33 @@ import java.util.Scanner;
 public class Settings {
 
     // hardware
-    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\virtual_studio\\e00\\r01";
+    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\raw\\input\\sticks1";
     public String          outputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\raw\\output";
-    public String   outputFileNameNotes = "staining_tongue";
+    public String   outputFileNameNotes = "fasting_lace";
     public int                threadCnt = 19;
     // routine
     public boolean             decimate = false;       // todo partly dysfunctional ?
 
     public boolean       nearestVertice = false;
     public boolean       nearestSurface = false;
-              public int subDivRecursionLvl = 3;
+                                        public int subDivRecursionLvl = 3;
 
     // render
-    public double                 ratio = .32;
+    public double                 ratio = .50;
     public double[]         maxDistance = {0,0,0};
-    public double[]            rotation = {0,360,50};
+    public double[]            rotation = {0,360,0};
     public int             iterationCnt = 10;
     public boolean     standardizeScale = true;
     public boolean        centerObjects = true;
 
 
-// a farmers will ; till these flake well
+
+
+
+
+
+
+// a farmers will ; until kick flakes well
     // TODO -----------------------------------------------------------
 // PRIORITIES
     // verify and test decimate
@@ -86,7 +92,7 @@ public class Settings {
 
 // dust bin
     public List<String>           files;
-    public List<Form> wellsprings;
+    public List<Form>       wellsprings;
     public List<Form[]>      workingSet = new ArrayList<>();
     public double[]          tempRotate = {0,0,0}; // variable used during moving might be worth it to test rotate
     public double[]            moveStep = {0,0,0}; // distance each iteration moves
@@ -123,6 +129,7 @@ public class Settings {
         System.out.print("               subgroups " + settings.groupCnt + "\n");
         System.out.print("          nearestVertice " + settings.nearestVertice + "\n");
         System.out.print("          nearestSurface " + settings.nearestSurface + "\n");
+        System.out.print("                   ratio " + settings.ratio + "\n");
         System.out.print("        standardizeScale " + settings.standardizeScale + "\n");
         System.out.print("           centerObjects " + settings.centerObjects + "\n");
         System.out.print("           vertexNormals " + settings.VertexNormals + "\n");
@@ -135,13 +142,20 @@ public class Settings {
         System.out.println("[1] closest vertex");
         System.out.println("[2] closest surface point");
         System.out.println("[3] decimate");
-        System.out.print("inputs:");
+        System.out.print("select:");
 
         Scanner keyboard = new Scanner(System.in);
         String selection = keyboard.next();
         if(selection.contains("1")) this.nearestVertice = true;
         if(selection.contains("2")) this.nearestSurface = true;
         if(selection.contains("3")) this.decimate = true;
+
+//        if(selection.contains("1") || selection.contains("2")){
+//            System.out.print("mratio:");
+//            selection = keyboard.next();
+//            this.ratio = Double.parseDouble(selection);
+//        }
+//        System.out.println();
     }
 }
 

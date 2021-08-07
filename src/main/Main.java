@@ -5,7 +5,6 @@ import main.tools.ObjOutput;
 import main.pool.ThreadPool;
 import me.tongfei.progressbar.ProgressBar;
 
-
 import java.util.*;
 
 public class Main {
@@ -23,53 +22,28 @@ public class Main {
 		pool.writeInfoFile();
 	}
 
-	// TODO
-	// TODO
-	// TODO COMPLETE WELLSPRING PASS BETWEEN SINGLE AND GROUP OVER HALL
-
-
 	void runSingl(ThreadPool pool) {
 		if (pool.setting.decimate) {
-			int runCnt = 1;
 			Settings.printSettings(pool.setting);
+
 			// pb declare
 			double vertCnt = 0;
 			for (Form form : pool.setting.wellsprings) vertCnt += form.f.size();
-			try (ProgressBar prod = new ProgressBar(" producing offspring" + runCnt, (long) vertCnt);
+			try (ProgressBar prod = new ProgressBar(" producing offspring" + 0, (long) vertCnt);
 				 ProgressBar save = new ProgressBar("", pool.setting.wellsprings.size())) {
 				prod.setExtraMessage((1) + "/" + pool.setting.iterationCnt);
 
 				for (Form form : pool.setting.wellsprings) {
-					String filesUsed = "";
-					for (String file : form.filesUsed) filesUsed = filesUsed.concat(", " + file);
 					pool.initializeTaskSingle(form);
-					System.out.println("_r" + runCnt + " " + filesUsed);
+					System.out.println("_r" + " " + form.id);
 					pool.run(prod);
-					runCnt++;
 				}
-				System.out.println("\nmigrating");
-				for (Form cur : pool.output) {
-					cur.v.clear();
-					SortedSet<Integer> keys = new TreeSet<>(cur.newV.keySet());
-					cur.v = new ArrayList<>(keys.size());
-					for (Integer key : keys) {
-						cur.v.add(key, cur.newV.get(key));
-					}
-					cur.f.clear();
-					for (Integer[] key : cur.newF.keySet()) {
-						List<Integer> intList = new ArrayList<Integer>(key.length);
-						intList.addAll(Arrays.asList(key));
-						cur.f.add(intList);
-					}
-				}
-				ObjOutput.output(pool, save, runCnt);
-				pool.setting.wellsprings = new ArrayList<>(pool.output);
+
+				pool.output.addAll(pool.setting.wellsprings);
+				ObjOutput.output(pool, save, 0);
 				pool.output.clear();
-				pool.setting.workingSet.clear();
 				pool.setting.groupStep[1] = pool.setting.groupStep[1] + 2;
-				System.out.println("finished migrating");
 			}
-			System.out.println("SINGLE pass complete");
 		}
 	}
 
@@ -79,7 +53,7 @@ public class Main {
 			pool.setting.group();
 			Settings.printSettings(pool.setting);
 
-			// pair iterate
+			// pairs iterate
 			for (Form[] springPair : pool.setting.workingSet) {
 				String filesUsed = "";
 				for (String file : springPair[0].filesUsed) filesUsed = filesUsed.concat(", " + file);
@@ -91,28 +65,27 @@ public class Main {
 					 ProgressBar save = new ProgressBar(" " + runCnt, pool.setting.iterationCnt)) {
 					prod.setExtraMessage((1) + "/" + pool.setting.iterationCnt);
 
-					// command run
+					// commands run
 					for (double i = 0; i < pool.setting.iterationCnt; i++) {
 						Form.step(springPair);
 						pool.initializeTaskGroup(springPair);
 						pool.run(prod);
 					}
+
+					// saving file
 					ObjOutput.output(pool, save, runCnt);
 					pool.output.clear();
 					pool.setting.groupStep[1] = pool.setting.groupStep[1] + 2;
 					runCnt++;
 				}
 			}
-			System.out.println("GROUP pass complete");
 		}
 	}
 
 	long startTime = time();
-
 	long time() {
 		return System.currentTimeMillis();
 	}
-
 	void runTime() {
 		long m = ((time() - startTime) / 1000) / 60;
 		long s = ((time() - startTime) / 1000) % 60;

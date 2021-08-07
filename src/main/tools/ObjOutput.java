@@ -46,8 +46,6 @@ public class ObjOutput {
             File file = new File(dirPath);
             FileWriter writer = new FileWriter(file);
 
-
-
             int cnt = 0;
             int Vcnt = 0;
             int VNcnt = 0;
@@ -101,19 +99,12 @@ public class ObjOutput {
                         System.out.print("something broken");
                     }
                 }
-//                // VN
-//                for (double[] vn : offspring.vn) {
-//                    writer.write("vn" + " " + df.format(vn[0])
-//                            + " " + df.format(vn[1])
-//                            + " " + df.format(vn[2])
-//                            + "\n");
-//                }
+
                 writer.write("usemtl None\n");
                 writer.write("s off\n");
                 writer.write("g objects\n");
 
                 // F
-//                    String curMat = "";
                 if(offspring.f.size() > 0){
                     for (List<Integer> cv : offspring.f) {
                         String f = "f ";
@@ -125,10 +116,6 @@ public class ObjOutput {
                     }
                 } else {
                     for (int j = 0; j < offspring.rawf.size(); j++) {
-//                    if (curMat != offspring.rawMats.get(j)){
-//                        curMat = offspring.rawMats.get(j);
-//                        writer.write("usemtl " + curMat + "\n");
-//                    }
                         String f = "f ";
                         String[] split = offspring.rawf.get(j).split(" ");
                         String parse = "/";

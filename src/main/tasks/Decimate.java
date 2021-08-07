@@ -3,6 +3,7 @@ package main.tasks;
 import main.form.Form;
 import main.pool.ThreadPool;
 
+import java.util.ArrayList;
 import java.util.List;
 
     public class Decimate implements Task {
@@ -13,10 +14,9 @@ import java.util.List;
         int edgecnt = 0;
         int newPointsCnt = 0;
 
-        public Decimate(int offIndex, ThreadPool pool) {
-            this.offIndex = offIndex;
+        public Decimate(Form wellspring, ThreadPool pool) {
+            this.wellspring = wellspring;
             this.pool = pool;
-            this.wellspring = pool.pairSpring[0];
         }
 
         @Override
@@ -28,7 +28,7 @@ import java.util.List;
 
             double midpointRatio = 0.5;
             // salience found in the leaves of a tree
-            for(int i = 0, j = pool.output.get(offIndex).f.size(); i < j; i++) {
+            for(int i = 0, j = wellspring.f.size(); i < j; i++) {
                 double edgLenAvrg = 0;
                 // gets indices used in triangle
                 // places them in triVrts
@@ -40,9 +40,8 @@ import java.util.List;
 
                 // double checks model uses triangles
                 if(triVrts[0].length != 0) {
-                    int offset = pool.output.get(offIndex).newV.size();
+                    int offset = wellspring.v.size();
                     double num = 0;
-
 
                     // 1->2
                     num = 0;
@@ -82,22 +81,36 @@ import java.util.List;
                         midpoint2[a] = (triVrts[1][a] + (ratio * (triVrts[2][a] - triVrts[1][a])));
                     }
 
-
-
                     if((edgLenAvrg/3) > 0.000004851310009745261) {
-                        pool.output.get(offIndex).newV.put(offset, midpoint0);
-                        pool.output.get(offIndex).newV.put(offset + 1, midpoint1);
-                        pool.output.get(offIndex).newV.put(offset + 2, midpoint2);
+                        wellspring.v.add(offset, midpoint0);
+                        wellspring.v.add(offset + 1, midpoint1);
+                        wellspring.v.add(offset + 2, midpoint2);
 
                         // creates triangles
-                        pool.output.get(offIndex).newF.put(new Integer[]{triRawvIndices.get(0), offset, offset + 1}, 1);
-                        pool.output.get(offIndex).newF.put(new Integer[]{triRawvIndices.get(1), offset, offset + 2}, 1);
-                        pool.output.get(offIndex).newF.put(new Integer[]{triRawvIndices.get(2), offset + 1, offset + 2}, 1);
-                        pool.output.get(offIndex).newF.put(new Integer[]{offset, offset + 1, offset + 2}, 1);
+                        ArrayList<Integer> tempF = new ArrayList<>();
+                        tempF.add(triRawvIndices.get(0));
+                        tempF.add(offset);
+                        tempF.add( offset + 1);
+                        wellspring.f.add(tempF);
+                        tempF.clear();
+                        tempF.add(triRawvIndices.get(1));
+                        tempF.add(offset);
+                        tempF.add( offset + 2);
+                        wellspring.f.add(tempF);
+                        tempF.clear();
+                        tempF.add(triRawvIndices.get(2));
+                        tempF.add(offset + 1);
+                        tempF.add( offset + 2);
+                        wellspring.f.add(tempF);
+                        tempF.clear();
+                        tempF.add(offset);
+                        tempF.add(offset + 1);
+                        tempF.add( offset + 2);
+                        wellspring.f.add(tempF);
                         newPointsCnt = newPointsCnt + 3;
                         edgecnt += 3;
                     } else {
-                        pool.output.get(offIndex).newF.put(new Integer[]{triRawvIndices.get(0), triRawvIndices.get(1), triRawvIndices.get(2)}, 1);
+                        pool.output.get(offIndex).newFaces.put(new Integer[]{triRawvIndices.get(0), triRawvIndices.get(1), triRawvIndices.get(2)}, 1);
                         edgecnt += 1;
                     }
                 } else {

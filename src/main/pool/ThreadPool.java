@@ -46,16 +46,9 @@ public class ThreadPool extends Thread{
     }
 
     public void initializeTaskSingle(Form parent) {
-        this.pairSpring = new Form[]{parent};
-        this.output.add(new Form(parent));
         int offIndex = this.output.size()-1;
-
-        if (this.output.get(offIndex).settings.decimate) {
-            // copies v into newV
-            for(int i = 0; i < this.output.get(offIndex).v.size(); i++){
-                this.output.get(offIndex).newV.put(i, this.output.get(offIndex).v.get(i));
-            }
-            execute(new Decimate(offIndex, this));
+        if (parent.settings.decimate) {
+            execute(new Decimate(parent, this));
         }
     }
 

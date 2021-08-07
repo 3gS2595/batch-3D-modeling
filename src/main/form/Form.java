@@ -32,11 +32,9 @@ public class Form {
 	public HashMap<Integer,List<List<Integer>>> siblingPolys = new HashMap<>();
 
 	// thread coordination
-	public ConcurrentHashMap<Integer, double[]> newV = new ConcurrentHashMap<>();
-	public ConcurrentHashMap<Integer[], Integer> newF = new ConcurrentHashMap<>();
-
-	public ConcurrentHashMap<Integer, double[]> newPoints       = new ConcurrentHashMap<>();
-	public ConcurrentHashMap<Integer, double[]> usedPoints      = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<Integer, double[]> newPoints  = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<Integer, double[]> usedPoints = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<Integer[],Integer> newFaces   = new ConcurrentHashMap<>();
 
 	// record keeping
 	public List<String>       filesUsed = new ArrayList<>();

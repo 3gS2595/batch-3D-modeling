@@ -48,7 +48,7 @@ public class DecimateThreaded implements Task {
                     vertices[0][0] + (ratio*(vertices[1][0] - vertices[0][0])),
                     vertices[0][1] + (ratio*(vertices[1][1] - vertices[0][1])),
                     vertices[0][2] + (ratio*(vertices[1][2] - vertices[0][2]))};
-            pool.output.get(offIndex).newV.put(offset, midpoint0);
+            pool.output.get(offIndex).newPoints.put(offset, midpoint0);
 
             // 1->3
             num =
@@ -62,7 +62,7 @@ public class DecimateThreaded implements Task {
                     vertices[0][0] + (ratio * (vertices[2][0] - vertices[0][0])),
                     vertices[0][1] + (ratio * (vertices[2][1] - vertices[0][1])),
                     vertices[0][2] + (ratio * (vertices[2][2] - vertices[0][2]))};
-            pool.output.get(offIndex).newV.put( offset+1, midpoint1);
+            pool.output.get(offIndex).newPoints.put( offset+1, midpoint1);
 
             // 2->3
             num =
@@ -76,13 +76,13 @@ public class DecimateThreaded implements Task {
                     vertices[1][0] + (ratio * (vertices[2][0] - vertices[1][0])),
                     vertices[1][1] + (ratio * (vertices[2][1] - vertices[1][1])),
                     vertices[1][2] + (ratio * (vertices[2][2] - vertices[1][2]))};
-            pool.output.get(offIndex).newV.put( offset+2, midpoint2);
+            pool.output.get(offIndex).newPoints.put( offset+2, midpoint2);
 
             // creates triangles
-            pool.output.get(offIndex).newF.put(new Integer[]{surface.get(0), offset, offset+1},1);
-            pool.output.get(offIndex).newF.put(new Integer[]{surface.get(1), offset, offset+2},1);
-            pool.output.get(offIndex).newF.put(new Integer[]{surface.get(2), offset+1, offset+2},1);
-            pool.output.get(offIndex).newF.put(new Integer[]{offset, offset+1, offset+2},1);
+            pool.output.get(offIndex).newFaces.put(new Integer[]{surface.get(0), offset, offset+1},1);
+            pool.output.get(offIndex).newFaces.put(new Integer[]{surface.get(1), offset, offset+2},1);
+            pool.output.get(offIndex).newFaces.put(new Integer[]{surface.get(2), offset+1, offset+2},1);
+            pool.output.get(offIndex).newFaces.put(new Integer[]{offset, offset+1, offset+2},1);
         } else {
             System.out.println("NON-TRIANGLE MESH, SUBDIVISION FAILURE");
         }
