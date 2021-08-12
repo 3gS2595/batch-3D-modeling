@@ -33,16 +33,17 @@ public class Main {
 				 ProgressBar save = new ProgressBar("", pool.setting.wellsprings.size())) {
 				prod.setExtraMessage((1) + "/" + pool.setting.iterationCnt);
 
+				// commands run
 				for (Form form : pool.setting.wellsprings) {
 					pool.initializeTaskSingle(form);
 					System.out.println("_r" + " " + form.id);
 					pool.run(prod);
 				}
-
+				// saving file
 				pool.output.addAll(pool.setting.wellsprings);
 				ObjOutput.output(pool, save, 0);
 				pool.output.clear();
-				pool.setting.groupStep[1] = pool.setting.groupStep[1] + 2;
+				//pool.setting.groupStep[1] += 2;
 			}
 		}
 	}
@@ -59,6 +60,7 @@ public class Main {
 				for (String file : springPair[0].filesUsed) filesUsed = filesUsed.concat(", " + file);
 				System.out.println("_r" + runCnt + " " + filesUsed);
 
+
 				// pb declare
 				double vertCnt = springPair[0].v.size() * springPair[0].settings.iterationCnt;
 				try (ProgressBar prod = new ProgressBar(" " + runCnt + " producing offspring", (long) vertCnt);
@@ -71,11 +73,10 @@ public class Main {
 						pool.initializeTaskGroup(springPair);
 						pool.run(prod);
 					}
-
 					// saving file
 					ObjOutput.output(pool, save, runCnt);
 					pool.output.clear();
-					pool.setting.groupStep[1] = pool.setting.groupStep[1] + 2;
+					pool.setting.groupStep[1] += 2;
 					runCnt++;
 				}
 			}

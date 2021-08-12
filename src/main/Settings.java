@@ -10,13 +10,12 @@ import java.util.Scanner;
 public class Settings {
 
     // hardware
-    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\raw\\input\\sticks1";
+    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\raw\\input\\inhouse";
     public String          outputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\raw\\output";
-    public String   outputFileNameNotes = "fasting_lace";
-    public int                threadCnt = 19;
+    public String   outputFileNameNotes = "a_moon_shines_brightest_in_the_sun";
+    public int                threadCnt = 18;
     // routine
-    public boolean             decimate = false;       // todo partly dysfunctional ?
-
+    public boolean             decimate = false;       // todo dysfunctional ?
     public boolean       nearestVertice = false;
     public boolean       nearestSurface = false;
                                         public int subDivRecursionLvl = 3;
@@ -28,65 +27,6 @@ public class Settings {
     public int             iterationCnt = 10;
     public boolean     standardizeScale = true;
     public boolean        centerObjects = true;
-
-
-
-
-
-
-
-
-// a farmers will ; until kick flakes well
-    // TODO -----------------------------------------------------------
-// PRIORITIES
-    // verify and test decimate
-    // support control over parent choice
-    // instead of using thread pool as object have run use a special object to house the array
-
-// TASK OPTIMIZATIONS/ TWEAKS
-    // compute both objects as mother for standard runs
-
-// STEP
-    // allow min and max (start here, end there, rather than end there)
-            // on rotational bounds ( will allow fine tuning runs post initial output)
-
-// GENERAL
-    // texture support
-    // certify the middle iterations objects are both cleanly centered
-
-
-// NEW TASKs
-    // remove used with prioritizing by farthest distance first.
-    // generate subdivisions to produce nasty polygon disbursement
-    // standard but limit how many times a point can be used
-    // center object and from the center pont shoot rays through the mother vertex and look
-    // for father vertex in ray path, use this as the nn
-
-    // rename single to wellspring and paris as couples or honestly pairSpring
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -104,7 +44,6 @@ public class Settings {
 
 // Current failings
     public boolean   removeUsedVertices = false;    // broken
-    public boolean        findBySegment = false;
     public boolean prioritizeByDistance = false;    // broken
 
     public Settings(){
@@ -149,13 +88,6 @@ public class Settings {
         if(selection.contains("1")) this.nearestVertice = true;
         if(selection.contains("2")) this.nearestSurface = true;
         if(selection.contains("3")) this.decimate = true;
-
-//        if(selection.contains("1") || selection.contains("2")){
-//            System.out.print("mratio:");
-//            selection = keyboard.next();
-//            this.ratio = Double.parseDouble(selection);
-//        }
-//        System.out.println();
     }
 }
 

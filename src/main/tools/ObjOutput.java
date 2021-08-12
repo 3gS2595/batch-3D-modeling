@@ -40,8 +40,8 @@ public class ObjOutput {
             String time = (java.time.LocalTime.now() + "").replace(':', '_');
             String date = (java.time.LocalDate.now() + "").replace('-', '_');
             String dirPath = pool.output.get(0).settings.outputFilePath
-                    +   runCnt + "_'" + date.substring(5,10) + "_" + date.substring(0,4)+ "__" + time.substring(0, 8)
-                    + "'_" + pool.output.get(0).settings.outputFileNameNotes
+                    +   runCnt + "_" + date.substring(5,10) + "_" + date.substring(0,4)+ "__" + time.substring(0, 8)
+                    + "_" + pool.output.get(0).settings.outputFileNameNotes
                     + ".obj";
             File file = new File(dirPath);
             FileWriter writer = new FileWriter(file);

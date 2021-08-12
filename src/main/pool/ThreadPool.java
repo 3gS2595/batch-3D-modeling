@@ -47,6 +47,8 @@ public class ThreadPool extends Thread{
 
     public void initializeTaskSingle(Form parent) {
         int offIndex = this.output.size()-1;
+
+        // vertex' taskX
         if (parent.settings.decimate) {
             execute(new Decimate(parent, this));
         }
@@ -57,7 +59,7 @@ public class ThreadPool extends Thread{
         this.output.add(new Form(parent[0]));
         int offIndex = this.output.size()-1;
 
-        // vertex' task creationX
+        // vertex' task X
         for(int i = 0, j = this.output.get(this.output.size()-1).v.size(); i < j; i++) {
             if (this.output.get(offIndex).settings.nearestVertice)
                 execute(new Standard(i, offIndex, this));
