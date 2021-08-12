@@ -76,7 +76,7 @@ public class Main {
 					// saving file
 					ObjOutput.output(pool, save, runCnt);
 					pool.output.clear();
-					pool.setting.groupStep[1] += 2;
+//					pool.setting.groupStep[1] += 2;
 					runCnt++;
 				}
 			}

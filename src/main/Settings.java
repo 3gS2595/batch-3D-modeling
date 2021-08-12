@@ -24,7 +24,7 @@ public class Settings {
     public double                 ratio = .50;
     public double[]         maxDistance = {0,0,0};
     public double[]            rotation = {0,360,0};
-    public int             iterationCnt = 10;
+    public int             iterationCnt = 3;
     public boolean     standardizeScale = true;
     public boolean        centerObjects = true;
 
