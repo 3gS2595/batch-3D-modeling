@@ -26,7 +26,7 @@ public class Form {
 	public List<List<Integer>>f = new ArrayList<>();
 	public List<Material>  mats = new ArrayList<>();
 
-	// normal averaging
+	// normal averaging ;unless optioned untouched
 	public List<double[]> 						  vNavg = new ArrayList<>();
 	public HashMap<Integer,List<Integer>> siblingPoints = new HashMap<>();
 	public HashMap<Integer,List<List<Integer>>> siblingPolys = new HashMap<>();
@@ -38,7 +38,7 @@ public class Form {
 
 	// record keeping
 	public List<String>       filesUsed = new ArrayList<>();
-	public double[] moved = {0,0,0,0,0,0}; // variable used during moving
+	public double[] moved = {0,0,0,0,0,0,0}; // variable used during moving
 
 
 
@@ -77,6 +77,7 @@ public class Form {
 	}
 
 	public void buildTree() {
+		this.KdTree = QuadTreeKD2.create(3);
 		for(int i = 0; i < this.v.size(); i++){
 			this.KdTree.insert(new double[]{this.v.get(i)[0], this.v.get(i)[1], this.v.get(i)[2]}, i);
 		}
@@ -89,7 +90,10 @@ public class Form {
 				wellspring[0].settings.moveStep[1],
 				wellspring[0].settings.moveStep[2]};
 		wellspring[0].translate(step);
-		wellspring[0].rotate();
+		wellspring[0].rotate(wellspring[0].settings.tempRotate);
+		if(wellspring[0].settings.iterateRatio == true){
+			wellspring[0].settings.ratio += wellspring[0].settings.moveStep[3];
+		}
 	}
 
 	public void standardizeScale(){
@@ -153,8 +157,8 @@ public class Form {
 	}
 
 	// ROTATE
-	public void rotate() {
-		if ( this.settings.tempRotate[0] != 0 || this.settings.tempRotate[1] != 0 || this.settings.tempRotate[2] != 0) {
+	public void rotate(double[] rotation) {
+		if ( rotation[0] != 0 || rotation[1] != 0 || rotation[2] != 0) {
 			double[][] tranM = new double[4][4];
 			for (int i = 0; i < 4; i++)
 				for (int j = 0; j < 4; j++)
@@ -164,8 +168,8 @@ public class Form {
 			tranM[1][1] = 1;
 			tranM[2][2] = 1;
 			tranM[3][3] = 1;
-			if (this.settings.tempRotate[0] > 0) {
-				double theta = Math.toRadians(this.settings.tempRotate[0]);
+			if (rotation[0] > 0) {
+				double theta = Math.toRadians(rotation[0]);
 				double cos = Math.cos(theta);
 				double sin = Math.sin(theta);
 				tranM[1][1] = cos;
@@ -174,8 +178,8 @@ public class Form {
 				tranM[2][2] = cos;
 				executeRotate(tranM);
 			}
-			if (this.settings.tempRotate[1] > 0) {
-				double theta = Math.toRadians(this.settings.tempRotate[1]);
+			if (rotation[1] > 0) {
+				double theta = Math.toRadians(rotation[1]);
 				double cos = Math.cos(theta);
 				double sin = Math.sin(theta);
 				tranM[0][0] = cos;
@@ -184,8 +188,8 @@ public class Form {
 				tranM[2][2] = cos;
 				executeRotate(tranM);
 			}
-			if (this.settings.tempRotate[2] > 0) {
-				double theta = Math.toRadians(this.settings.tempRotate[2]);
+			if (rotation[2] > 0) {
+				double theta = Math.toRadians(rotation[2]);
 				double cos = Math.cos(theta);
 				double sin = Math.sin(theta);
 				tranM[0][1] = cos;
@@ -194,9 +198,9 @@ public class Form {
 				tranM[1][1] = cos;
 				executeRotate(tranM);
 			}
-			this.moved[3] += this.settings.tempRotate[0];
-			this.moved[4] += this.settings.tempRotate[1];
-			this.moved[5] += this.settings.tempRotate[2];
+			this.moved[3] += rotation[0];
+			this.moved[4] += rotation[1];
+			this.moved[5] += rotation[2];
 		}
 	}
 	private void executeRotate(double[][] tranM){
@@ -209,71 +213,6 @@ public class Form {
 			prime[1] = (x * tranM[1][0]) + (y * tranM[1][1]) + (z * tranM[1][2]) + (1 * tranM[1][3]);
 			prime[2] = (x * tranM[2][0]) + (y * tranM[2][1]) + (z * tranM[2][2]) + (1 * tranM[2][3]);
 			this.v.set(i, new double[]{prime[0], prime[1], prime[2]});
-		}
-	}
-
-	public void calculateNormals(){
-		// uses the cross product of two edges
-		// implemented as (v2 - v1) cross-product (v3 - v1)
-
-		double[] wait = {0,0,0};
-		this.vn.add(wait);
-		int[] verts;
-		for(String curPoly: this.rawf){
-			String[] raw = curPoly.split(" ");
-			curPoly = curPoly.substring(1).replace(" ","");
-			if(curPoly.contains("//")){
-				verts = new int[]{Integer.parseInt(raw[1].split("//")[0]),
-						Integer.parseInt(raw[2].split("//")[0]),
-						Integer.parseInt(raw[3].split("//")[0])};
-			} else {
-				verts = new int[]{Integer.parseInt(raw[1].split("/")[0]),
-						Integer.parseInt(raw[2].split("/")[0]),
-						Integer.parseInt(raw[3].split("/")[0])};
-			}
-
-			double [] u = { //B-A
-					this.v.get(verts[1]-1)[0] - this.v.get(verts[0]-1)[0],
-					this.v.get(verts[1]-1)[1] - this.v.get(verts[0]-1)[1],
-					this.v.get(verts[1]-1)[2] - this.v.get(verts[0]-1)[2]};
-			double [] v = { //A-B
-					this.v.get(verts[2]-1)[0] - this.v.get(verts[0]-1)[0],
-					this.v.get(verts[2]-1)[1] - this.v.get(verts[0]-1)[1],
-					this.v.get(verts[2]-1)[2] - this.v.get(verts[0]-1)[2]};
-			double[] vn = {
-					(u[1] * v[2]) - (u[2] * v[1]),
-					(u[2] * v[0]) - (u[0] * v[2]),
-					(u[1] * v[1]) - (u[1] * v[0])
-			};
-
-			double length = Math.sqrt(vn[0] * vn[0] + vn[1] * vn[1] + vn[2] * vn[2]);
-			double[] vnNormal = {vn[0]/length, vn[1]/length, vn[2]/length};
-			this.vn.add(vnNormal);
-		}
-
-		// averages
-		if(this.settings.avgVertexNormals) {
-			this.vNavg = new ArrayList<>(this.vn);
-			for (Integer key : this.siblingPoints.keySet()) {
-				List<Integer> t = this.siblingPoints.get(key);
-				int cnt = 0;
-				double[] build = {0, 0, 0};
-				for (Integer integer : t) {
-					build[0] += this.vn.get(integer)[0];
-					build[1] += this.vn.get(integer)[1];
-					build[2] += this.vn.get(integer)[2];
-					cnt++;
-				}
-				build[0] = build[0] / cnt;
-				build[1] = build[1] / cnt;
-				build[2] = build[2] / cnt;
-
-				double length = Math.sqrt(build[0] * build[0] + build[1] * build[1] + build[2] * build[2]);
-				double[] vnNormal = {build[0] / length, build[1] / length, build[2] / length};
-				this.vNavg.set(key, vnNormal);
-			}
-
-			this.vn = new ArrayList<>(this.vNavg);
 		}
 	}
 }

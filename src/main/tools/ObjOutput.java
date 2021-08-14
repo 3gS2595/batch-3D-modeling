@@ -28,23 +28,24 @@ public class ObjOutput {
         }
         else {
             System.out.println("FOLDER CREATION FAILURE");
-            return settings.outputFilePath;
+            return settings.outputFolder;
         }
     }
 
     public static void output(ThreadPool pool, ProgressBar pb1, int runCnt) {
         try {
-            if (pool.output.get(0).settings.VertexNormals) pool.output.get(0).calculateNormals();
+//            if (pool.output.get(0).settings.VertexNormals) pool.output.get(0).calculateNormals();
 
             // names file based on time-date
             String time = (java.time.LocalTime.now() + "").replace(':', '_');
             String date = (java.time.LocalDate.now() + "").replace('-', '_');
-            String dirPath = pool.output.get(0).settings.outputFilePath
+            String dirPath = pool.output.get(0).settings.outputFolder
                     +   runCnt + "_" + date.substring(5,10) + "_" + date.substring(0,4)+ "__" + time.substring(0, 8)
                     + "_" + pool.output.get(0).settings.outputFileNameNotes
                     + ".obj";
             File file = new File(dirPath);
             FileWriter writer = new FileWriter(file);
+            System.out.println("\n" + dirPath);
 
             int cnt = 0;
             int Vcnt = 0;

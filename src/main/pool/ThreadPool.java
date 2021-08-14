@@ -39,15 +39,13 @@ public class ThreadPool extends Thread{
             threads[i].start();
         }
 
-        //waits for all threads to return home
+        //waits for all threads to come home
         for(WorkerThread temp:threads){
             try { temp.join();} catch (InterruptedException e) { e.printStackTrace(); }
         }
     }
 
     public void initializeTaskSingle(Form parent) {
-        int offIndex = this.output.size()-1;
-
         // vertex' taskX
         if (parent.settings.decimate) {
             execute(new Decimate(parent, this));
@@ -94,16 +92,14 @@ public class ThreadPool extends Thread{
 
     public void writeInfoFile() {
         try {
-            String dirPath = this.setting.outputFilePath + "infoFile" + ".txt";
+            String dirPath = this.setting.outputFolder + "infoFile" + ".txt";
             File file = new File(dirPath);
             FileWriter writer = new FileWriter(file);
-            for (String entry : this.logText) {
+            for (String entry : this.logText)
                 writer.write(entry);
-            }
+
             writer.flush();
             writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e){e.printStackTrace();}
     }
 }

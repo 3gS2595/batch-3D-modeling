@@ -50,8 +50,8 @@ public class SetUp {
                     String check1 = setting.wellsprings.get(j).id.concat(setting.wellsprings.get(i).id);
                     entryCheck.put(check0,"0");
                     entryCheck.put(check1,"1");
-                    Form file0 = new Form(setting.wellsprings.get(i));
-                    Form file1 = new Form(setting.wellsprings.get(j));
+                    Form file0 = setting.wellsprings.get(i);
+                    Form file1 = setting.wellsprings.get(j);
                     file0.filesUsed = new ArrayList<>();
                     file1.filesUsed = new ArrayList<>();
 
@@ -83,7 +83,9 @@ public class SetUp {
                     wellSpring[0].settings.moveStep = new double[]{
                             (setting.maxDistance[0] * 2) / setting.iterationCnt,
                             (setting.maxDistance[1] * 2) / setting.iterationCnt,
-                            (setting.maxDistance[2] * 2) / setting.iterationCnt};
+                            (setting.maxDistance[2] * 2) / setting.iterationCnt,
+                            (setting.ratio/setting.iterationCnt)};
+                    setting.ratio = 0;
                     wellSpring[0].settings.tempRotate = new double[]{
                             (setting.rotation[0]) / setting.iterationCnt,
                             (setting.rotation[1]) / setting.iterationCnt,
@@ -106,7 +108,6 @@ public class SetUp {
 
     // finds .obj files recursively starting at the input folder
     private static class Searcher {
-
         private final String root;
 
         public Searcher(String root) {
