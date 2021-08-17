@@ -13,7 +13,7 @@ public class Settings {
         // decimate produces a handful of 0 points only on complex meshes
 
     // hardware
-    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\input\\inhouse";
+    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\input\\sticks";
     public String          outputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\output";
     public String   outputFileNameNotes = "cold_moon_brights_in_the_sun";
 
@@ -24,9 +24,9 @@ public class Settings {
                                         public int subDivRecursionLvl = 3;
 
     // render
-    public double[]         maxDistance = {0.01,0,0};
+    public double[]         maxDistance = {0,0,0};
     public double[]            rotation = {0,0,0};
-    public double                 ratio = .4;
+    public double                 ratio = 1;
     public int             iterationCnt = 3;
     public boolean         iterateRatio = false;
     public boolean       reversedRepeat = false;
@@ -41,6 +41,24 @@ public class Settings {
     public boolean          un_spinForms = true;
     public int                threadCnt = 18;
 
+
+
+
+
+
+
+
+
+
+
+
+    // pairs should be done through a list string arrays correlating to spring ID
+    // splice a new spring and take what you need from any number of forms
+    // us this in file selection
+    //   scan all of a database folder
+    //   select mother, than select father from list
+    // live update on web gui
+    //   refreshes file saves and code changes/re compiles
 
     // dust bin
     public List<String>           files;

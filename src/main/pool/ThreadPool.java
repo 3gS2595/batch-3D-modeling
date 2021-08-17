@@ -71,12 +71,7 @@ public class ThreadPool extends Thread{
             else if (this.output.get(offIndex).settings.prioritizeByDistance)
                 execute(new PrioritizeDistance(i, this));
         }
-        this.output.get(offIndex).moved[0] = parent[0].moved[0];
-        this.output.get(offIndex).moved[1] = parent[0].moved[1];
-        this.output.get(offIndex).moved[2] = parent[0].moved[2];
-        this.output.get(offIndex).moved[3] = parent[1].moved[3];
-        this.output.get(offIndex).moved[4] = parent[1].moved[4];
-        this.output.get(offIndex).moved[5] = parent[1].moved[5];
+        setMove(offIndex, parent);
     }
 
     void execute(Task task) {
@@ -106,5 +101,14 @@ public class ThreadPool extends Thread{
             writer.flush();
             writer.close();
         } catch (IOException e){e.printStackTrace();}
+    }
+
+    void setMove(int offIndex, Form[] parent){
+        this.output.get(offIndex).moved[0] = parent[0].moved[0];
+        this.output.get(offIndex).moved[1] = parent[0].moved[1];
+        this.output.get(offIndex).moved[2] = parent[0].moved[2];
+        this.output.get(offIndex).moved[3] = parent[1].moved[3];
+        this.output.get(offIndex).moved[4] = parent[1].moved[4];
+        this.output.get(offIndex).moved[5] = parent[1].moved[5];
     }
 }

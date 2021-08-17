@@ -111,6 +111,9 @@ public class SetUp {
                             -setting.maxDistance[0],
                             -setting.maxDistance[1],
                             -setting.maxDistance[2]};
+                    wellSpring[0].moved[0] += -setting.maxDistance[0];
+                    wellSpring[0].moved[1] += -setting.maxDistance[1];
+                    wellSpring[0].moved[2] += -setting.maxDistance[2];
                     wellSpring[0].translate(XyzIterationStepInitiator);
                     wellSpring[0].settings.moveStep = new double[]{
                             (setting.maxDistance[0] * 2) / setting.iterationCnt,

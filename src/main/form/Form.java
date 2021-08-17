@@ -94,6 +94,12 @@ public class Form {
 				wellspring[0].settings.moveStep[2]};
 		wellspring[0].translate(step);
 		wellspring[1].rotate(wellspring[1].settings.tempRotate);
+		wellspring[0].moved[0] += wellspring[0].settings.moveStep[0];
+		wellspring[0].moved[1] += wellspring[0].settings.moveStep[1];
+		wellspring[0].moved[2] += wellspring[0].settings.moveStep[2];
+		wellspring[1].moved[3] += wellspring[0].settings.tempRotate[0];
+		wellspring[1].moved[4] += wellspring[0].settings.tempRotate[1];
+		wellspring[1].moved[5] += wellspring[0].settings.tempRotate[2];
 		if(wellspring[0].settings.iterateRatio){
 			wellspring[0].settings.ratio += wellspring[0].settings.moveStep[3];
 		}
@@ -155,9 +161,6 @@ public class Form {
 			}
 		}
 		this.buildTree();
-		this.moved[0] += amount[0];
-		this.moved[1] += amount[1];
-		this.moved[2] += amount[2];
 	}
 
 	// ROTATE
@@ -202,9 +205,6 @@ public class Form {
 				tranM[1][1] = cos;
 				executeRotate(tranM);
 			}
-			this.moved[3] += rotation[0];
-			this.moved[4] += rotation[1];
-			this.moved[5] += rotation[2];
 		}
 	}
 	private void executeRotate(double[][] tranM){

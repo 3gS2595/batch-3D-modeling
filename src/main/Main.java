@@ -48,13 +48,19 @@ public class Main {
 		runCnt++;
 	}
 
+	// reverse should output placing each correlating iteration with the other spaced as tuples etc
 	boolean reverseRun = false;
+	double[] move0 = new double[7];
+	double[] move1 = new double[7];
 	double initialStep = Double.MAX_VALUE;
 	void runGroup(ThreadPool pool) {
 		if (pool.setting.nearestVertice || pool.setting.nearestSurface) {
 			pool.setting.group();
+			if(!reverseRun) System.arraycopy(pool.setting.workingSet.get(0)[0].moved, 0, move0, 0, pool.setting.workingSet.get(0)[0].moved.length);
+			if(!reverseRun) System.arraycopy(pool.setting.workingSet.get(0)[1].moved, 0, move1, 0, pool.setting.workingSet.get(0)[1].moved.length);
 			Settings.printSettingsGroup(pool.setting);
 
+			// configuring run REPEAT
 			if(initialStep == Double.MAX_VALUE) initialStep = pool.setting.groupStep[1];
 			if(pool.setting.reversedRepeat && reverseRun){
 				pool.setting.groupStep[1] = initialStep;
@@ -65,7 +71,10 @@ public class Main {
 					pool.setting.groupStep[0] +=
 							pool.setting.separationDistanceX * pool.setting.iterationCnt
 							+ (pool.setting.separationDistanceX / 2);
+					pool.setting.workingSet.get(i)[0].moved = move0;
+					pool.setting.workingSet.get(i)[1].moved = move1;
 				}
+
 			}
 
 			// coupling iterate
