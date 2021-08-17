@@ -9,18 +9,14 @@ import java.util.Scanner;
 
 public class Settings {
 
-    // repeat after turning form 180d
     // KNOWN BUGS
-        // infoFile move records remain null
         // decimate produces a handful of 0 points only on complex meshes
-        // MAJOR rotational iteration changes nothing in form
 
     // hardware
-    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\input\\sticks1";
+    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\input\\inhouse";
     public String          outputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\output";
-//    public String   outputFileNameNotes = "a_cold_moon_shines_brightest_in_the_sun";
-    public String   outputFileNameNotes = "stained";
-    public int                threadCnt = 18;
+    public String   outputFileNameNotes = "cold_moon_brights_in_the_sun";
+
     // routine
     public boolean             decimate = false;       // todo dysfunctional ?
     public boolean       nearestVertice = false;
@@ -28,23 +24,32 @@ public class Settings {
                                         public int subDivRecursionLvl = 3;
 
     // render
-    public double[]         maxDistance = {0,0,0};
-    public double[]            rotation = {0,360,0};
-    public double                 ratio = .5;
-    public int             iterationCnt = 5;
+    public double[]         maxDistance = {0.01,0,0};
+    public double[]            rotation = {0,0,0};
+    public double                 ratio = .4;
+    public int             iterationCnt = 3;
     public boolean         iterateRatio = false;
-    public boolean       reversedRepeat = true;
+    public boolean       reversedRepeat = false;
     public boolean     standardizeScale = true;
     public boolean        centerObjects = true;
 
+    // optionals
+    public boolean manualParentSelection = false;
+    public double    separationDistanceX = 0.7;
+    public double    separationDistanceY = 1.5;
+    public boolean            saveOutput = true;
+    public boolean          un_spinForms = true;
+    public int                threadCnt = 18;
 
-// dust bin
+
+    // dust bin
     public List<String>           files;
     public List<Form>       wellsprings;
     public List<Form[]>      workingSet = new ArrayList<>();
     public double[]          tempRotate = {0,0,0}; // variable used during moving might be worth it to test rotate
     public double[]            moveStep = {0,0,0,0}; // distance each iteration moves merge ratio@[3] ??
     public double[]           groupStep = {0,0,0};
+
     public boolean        VertexNormals = false;
     public boolean     avgVertexNormals = false;
     public int                 groupCnt;
@@ -61,6 +66,42 @@ public class Settings {
         this.files = setup.files;
         this.groupCnt = this.wellsprings.size();
     }
+
+    @SuppressWarnings("CopyConstructorMissesField")
+    public Settings(Settings settings) {
+        this.inputFolder = settings.inputFolder;
+        this.outputFolder = settings.outputFolder;
+        this.outputFileNameNotes = settings.outputFileNameNotes;
+        this.decimate = settings.decimate;
+        this.nearestVertice = settings.nearestVertice;
+        this.nearestSurface = settings.nearestSurface;
+        System.arraycopy(settings.maxDistance, 0, this.maxDistance, 0, settings.maxDistance.length);
+        System.arraycopy(settings.rotation, 0, this.rotation, 0, settings.rotation.length);
+        this.ratio = 0 + settings.ratio;
+        this.iterationCnt = settings.iterationCnt;
+        this.iterateRatio = settings.iterateRatio;
+        this.reversedRepeat = settings.reversedRepeat;
+        this.standardizeScale = settings.standardizeScale;
+        this.centerObjects = settings.centerObjects;
+        this.manualParentSelection = settings.manualParentSelection;
+        this.separationDistanceX = settings.separationDistanceX;
+        this.separationDistanceY = settings.separationDistanceY;
+        this.saveOutput = settings.saveOutput;
+        this.un_spinForms = settings.un_spinForms;
+        this.threadCnt = settings.threadCnt;
+        this.files = settings.files;
+        this.wellsprings = settings.wellsprings;
+        this.workingSet = settings.workingSet;
+        this.tempRotate = settings.tempRotate;
+        this.moveStep = settings.moveStep;
+        this.groupStep = settings.groupStep;
+        this.VertexNormals = settings.VertexNormals;
+        this.avgVertexNormals = settings.avgVertexNormals;
+        this.groupCnt = settings.groupCnt;
+        this.removeUsedVertices = settings.removeUsedVertices;
+        this.prioritizeByDistance = settings.prioritizeByDistance;
+    }
+
 
     // could output single run into working set, and then use that as input to get (grouped) working set
     public void group(){
@@ -106,20 +147,28 @@ public class Settings {
     void optionSelection() {
         System.out.println("[1] closest vertex");
         System.out.println("[2] closest surface point");
-//        System.out.println("[3] resink");
         System.out.println("[3] decimate");
-        System.out.print("select:");
+        System.out.println("*");
+        System.out.println("[4] ratio iterate");
+        System.out.println("[5] reverse run");
+        System.out.println("[6] manual wellsprings");
+        System.out.println("*");
+        System.out.println("[7] no saving");
+        System.out.print("inputs:");
 
         Scanner keyboard = new Scanner(System.in);
         String selection = keyboard.nextLine();
         if(selection.contains("1")) this.nearestVertice = true;
         if(selection.contains("2")) this.nearestSurface = true;
         if(selection.contains("3")) this.decimate = true;
+        if(selection.contains("4")) this.iterateRatio = true;
+        if(selection.contains("5")) this.reversedRepeat = true;
+        if(selection.contains("6")) this.manualParentSelection = true;
+        if(selection.contains("7")) this.saveOutput = false;
         selection = selection.replaceAll("[0-9]","");
         selection = selection.replaceAll(" ", "_");
         selection = "_".concat(selection);
         outputFileNameNotes = "" + outputFileNameNotes.concat(selection);
-
     }
 }
 

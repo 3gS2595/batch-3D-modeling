@@ -60,12 +60,14 @@ public class Form {
 	}
 
 	// used to make basis for offspring
+	@SuppressWarnings("CopyConstructorMissesField")
 	public Form(Form form) {
 		this.id = form.id;
 		this.ObjName = form.ObjName;
 		this.MtlName = form.MtlName;
 		this.siblingPoints = form.siblingPoints;
-		this.settings = form.settings;
+		this.settings = new Settings(form.settings);
+		this.settings.moveStep = form.settings.moveStep;
 		this.v = new ArrayList<>(form.v);
 		this.vn = new ArrayList<>(form.vn);
 		this.rawf = new ArrayList<>(form.rawf);
@@ -73,7 +75,8 @@ public class Form {
 		this.filesUsed = new ArrayList<>(form.filesUsed);
 		this.KdTree = form.KdTree;
 		this.siblingPolys = form.siblingPolys;
-		this.moved = form.moved;
+		this.moved = new double[form.moved.length];
+		System.arraycopy(form.moved, 0, this.moved, 0, form.moved.length);
 	}
 
 	public void buildTree() {
@@ -90,8 +93,8 @@ public class Form {
 				wellspring[0].settings.moveStep[1],
 				wellspring[0].settings.moveStep[2]};
 		wellspring[0].translate(step);
-		wellspring[0].rotate(wellspring[0].settings.tempRotate);
-		if(wellspring[0].settings.iterateRatio == true){
+		wellspring[1].rotate(wellspring[1].settings.tempRotate);
+		if(wellspring[0].settings.iterateRatio){
 			wellspring[0].settings.ratio += wellspring[0].settings.moveStep[3];
 		}
 	}

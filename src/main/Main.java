@@ -40,38 +40,37 @@ public class Main {
 				}
 				// saving file
 				pool.output.addAll(pool.setting.wellsprings);
-				ObjOutput.output(pool, savepb, 0);
-				pool.output.clear();
-				pool.setting.groupStep[1] += 2;
+				if(pool.setting.saveOutput) ObjOutput.output(pool, savepb, 0);
+				pool.setting.groupStep[1] += pool.setting.separationDistanceY;
 			}
 		}
 	}
 
-	double[] initialStep = new double[4];
 	boolean reverseRun = false;
+	double initialStep = -777;
+	int runCnt = 1;
 	void runGroup(ThreadPool pool) {
-		initialStep = pool.setting.groupStep;
-
 		if (pool.setting.nearestVertice || pool.setting.nearestSurface) {
-			int runCnt = 1;
 			pool.setting.group();
 			Settings.printSettingsGroup(pool.setting);
 
+			if(initialStep == -777) initialStep = pool.setting.groupStep[1];
 			if(pool.setting.reversedRepeat && reverseRun){
-				pool.setting.groupStep = initialStep;
-				double[] ro = new double[]{10.0,180.0,10.0};
+				pool.setting.groupStep[1] = initialStep;
+				double[] ro = new double[]{0.0,0.0,180.0};
 				for(int i =0; i < pool.setting.workingSet.size(); i++){
-					System.out.println(pool.setting.workingSet.get(i)[1].v.get(5)[0]);
 					pool.setting.workingSet.get(i)[1].rotate(ro);
 					pool.setting.workingSet.get(i)[1].buildTree();
-					System.out.println(pool.setting.workingSet.get(i)[1].v.get(5)[0]);
-					System.out.println();
-
+					// separates repeat from first pass
+					pool.setting.groupStep[0] +=
+							pool.setting.separationDistanceX * pool.setting.iterationCnt
+							+ (pool.setting.separationDistanceX / 2);
 				}
 			}
 
 			// coupling iterate
 			for (Form[] springPair : pool.setting.workingSet) {
+
 				String filesUsed = "";
 				for (String file : springPair[0].filesUsed) filesUsed = filesUsed.concat(", " + file);
 				System.out.println("_r" + runCnt + " " + filesUsed);
@@ -84,15 +83,15 @@ public class Main {
 					prod.setExtraMessage((1) + "/" + pool.setting.iterationCnt);
 
 					// commands run
+					if(pool.setting.iterateRatio) springPair[0].settings.ratio = 0;
 					for (double i = 0; i < pool.setting.iterationCnt; i++) {
 						Form.step(springPair);
 						pool.initializeTaskGroup(springPair);
 						pool.run(prod);
 					}
 					// saving file
-					ObjOutput.output(pool, save, runCnt);
-					pool.output.clear();
-					pool.setting.groupStep[1] += 2;
+					if(pool.setting.saveOutput) ObjOutput.output(pool, save, runCnt);
+					pool.setting.groupStep[1] += pool.setting.separationDistanceY;
 					runCnt++;
 				}
 			}

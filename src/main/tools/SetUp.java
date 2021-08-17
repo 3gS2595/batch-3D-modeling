@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 
 public class SetUp {
     public List<Form> singles;
@@ -15,13 +16,11 @@ public class SetUp {
 
     // initial fil intake
     public SetUp(Settings settings){
-        if (settings.outputFolder.charAt(settings.outputFolder.length()-1) != '\\')
-            settings.outputFolder = settings.outputFolder.concat("\\");
 
         // finds .obj files
         List<String> files = (new Searcher(Paths.get(settings.inputFolder).toString())).search();
         List<Form> loadedFiles = new ArrayList<>();
-        if (files.size() % 2 != 0 && !settings.decimate) files.remove(files.size() - 1);
+//        if (files.size() % 2 != 0 && !settings.decimate) files.remove(files.size() - 1);
         System.out.println("intaking-" + files.size());
 
         // loads files from found paths
@@ -54,25 +53,58 @@ public class SetUp {
                     Form file1 = setting.wellsprings.get(j);
                     file0.filesUsed = new ArrayList<>();
                     file1.filesUsed = new ArrayList<>();
-
-                    // [0] = mother , donates polygons
                     Form[] wellSpring = new Form[]{null, null};
-                    if (file0.v.size() > file1.v.size()) {
-                        file0.filesUsed.add(setting.wellsprings.get(j).id);
-                        file0.filesUsed.add(setting.wellsprings.get(i).id);
-                        wellSpring[0] = file0;
-                        file1.filesUsed.add(setting.wellsprings.get(j).id);
-                        file1.filesUsed.add(setting.wellsprings.get(i).id);
-                        wellSpring[1] = file1;
 
-                    }
-                    else {
-                        file1.filesUsed.add(setting.wellsprings.get(i).id);
-                        file1.filesUsed.add(setting.wellsprings.get(j).id);
-                        wellSpring[0] = file1;
-                        file0.filesUsed.add(setting.wellsprings.get(i).id);
-                        file0.filesUsed.add(setting.wellsprings.get(j).id);
-                        wellSpring[1] = file0;
+                    if(setting.manualParentSelection){
+                        System.out.println("\nselect wellsprings mother");
+                        File f0 = new File(file0.ObjName);
+                        File f1 = new File(file1.ObjName);
+                        System.out.println("[1] " + file0.id + " " + f0.length());
+                        System.out.println("[2] " + file1.id + " " + f1.length());
+                        Scanner keyboard = new Scanner(System.in);
+                        String selection = keyboard.nextLine();
+                        if(selection.contains("1")) {
+                            file0.filesUsed.add(setting.wellsprings.get(j).id);
+                            file0.filesUsed.add(setting.wellsprings.get(i).id);
+                            file0.settings = setting;
+                            wellSpring[0] = file0;
+                            file1.filesUsed.add(setting.wellsprings.get(j).id);
+                            file1.filesUsed.add(setting.wellsprings.get(i).id);
+                            file0.settings = setting;
+                            wellSpring[1] = file1;
+                        }
+                        if(selection.contains("2")) {
+                            file1.filesUsed.add(setting.wellsprings.get(i).id);
+                            file1.filesUsed.add(setting.wellsprings.get(j).id);
+                            file0.settings = setting;
+                            wellSpring[0] = file1;
+                            file0.filesUsed.add(setting.wellsprings.get(i).id);
+                            file0.filesUsed.add(setting.wellsprings.get(j).id);
+                            file0.settings = setting;
+                            wellSpring[1] = file0;
+                        }
+                    } else {
+                        // [0] = mother , donates polygons
+                        if (file0.v.size() > file1.v.size()) {
+                            file0.filesUsed.add(setting.wellsprings.get(j).id);
+                            file0.filesUsed.add(setting.wellsprings.get(i).id);
+                            file0.settings = setting;
+                            wellSpring[0] = file0;
+                            file1.filesUsed.add(setting.wellsprings.get(j).id);
+                            file1.filesUsed.add(setting.wellsprings.get(i).id);
+                            file0.settings = setting;
+                            wellSpring[1] = file1;
+
+                        } else {
+                            file1.filesUsed.add(setting.wellsprings.get(i).id);
+                            file1.filesUsed.add(setting.wellsprings.get(j).id);
+                            file0.settings = setting;
+                            wellSpring[0] = file1;
+                            file0.filesUsed.add(setting.wellsprings.get(i).id);
+                            file0.filesUsed.add(setting.wellsprings.get(j).id);
+                            file0.settings = setting;
+                            wellSpring[1] = file0;
+                        }
                     }
 
                     double[] XyzIterationStepInitiator = new double[]{
@@ -85,7 +117,10 @@ public class SetUp {
                             (setting.maxDistance[1] * 2) / setting.iterationCnt,
                             (setting.maxDistance[2] * 2) / setting.iterationCnt,
                             (setting.ratio/setting.iterationCnt)};
-                    setting.ratio = 0;
+//                    System.out.println(wellSpring[0].id);
+//                    System.out.println(setting.ratio);
+//                    System.out.println(setting.ratio/setting.iterationCnt);
+//                    System.out.println(wellSpring[0].settings.moveStep[3]);
                     wellSpring[0].settings.tempRotate = new double[]{
                             (setting.rotation[0]) / setting.iterationCnt,
                             (setting.rotation[1]) / setting.iterationCnt,
@@ -94,7 +129,7 @@ public class SetUp {
                 }
             }
         }
-
+        if(setting.iterateRatio) setting.ratio = 0;
 // use to debug matching
 //        for (Form[] g :wellsprings){
 //            System.out.println(g.length + " " + wellsprings.size());

@@ -39,7 +39,7 @@ import java.util.List;
                 }
 
                 // double checks model uses triangles
-                if(triVrts[0].length != 0) {
+                if(triVrts.length != 2) {
                     int offset = wellspring.v.size();
                     double num = 0;
 
@@ -110,6 +110,8 @@ import java.util.List;
                         newPointsCnt = newPointsCnt + 3;
                         edgecnt += 3;
                     } else {
+                        // TODO this causes issues in DECIMATE
+                        // TODO this is most likely do to the tri raws not being populated
                         pool.output.get(offIndex).newFaces.put(new Integer[]{triRawvIndices.get(0), triRawvIndices.get(1), triRawvIndices.get(2)}, 1);
                         edgecnt += 1;
                     }

@@ -48,6 +48,9 @@ public class Standard implements Task {
             for (int i = 0; i < pairSpring[0].v.size(); i++) {
                 newV.add(pool.output.get(offIndex).newPoints.get(i));
             }
+//            System.out.println(pairSpring[0].settings.ratio);
+//            System.out.println(newV.get(i)[0] + "\n" + pairSpring[0].v.get(i)[0]);
+//            System.out.println();
             pool.output.get(offIndex).v = new ArrayList<>(newV);
         }
     }

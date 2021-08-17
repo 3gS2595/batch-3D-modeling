@@ -19,17 +19,21 @@ public class ObjOutput {
         String dirPath = settings.outputFolder + "/"
                 +   date.substring(5,10) + "_" + date.substring(0,4)+ "__" + time.substring(0, 8)
                 + settings.outputFileNameNotes + "/";
+        dirPath = dirPath.replace("\\", "/");
         File file = new File(dirPath);
 
-        //Creating the directory
-        boolean bool = file.mkdir();
-        if(bool) {
-            return dirPath;
+        if(settings.saveOutput) {
+
+            //Creating the directory
+            boolean bool = file.mkdir();
+            if (bool) {
+                return dirPath;
+            } else {
+                System.out.println("FOLDER CREATION FAILURE");
+                return settings.outputFolder;
+            }
         }
-        else {
-            System.out.println("FOLDER CREATION FAILURE");
-            return settings.outputFolder;
-        }
+        return null;
     }
 
     public static void output(ThreadPool pool, ProgressBar pb1, int runCnt) {
@@ -39,13 +43,14 @@ public class ObjOutput {
             // names file based on time-date
             String time = (java.time.LocalTime.now() + "").replace(':', '_');
             String date = (java.time.LocalDate.now() + "").replace('-', '_');
-            String dirPath = pool.output.get(0).settings.outputFolder
-                    +   runCnt + "_" + date.substring(5,10) + "_" + date.substring(0,4)+ "__" + time.substring(0, 8)
+            System.out.println(pool.output.get(0).settings.outputFolder);
+            String filePath = pool.output.get(0).settings.outputFolder
+                    +  runCnt + "_" + date.substring(5,10) + "_" + date.substring(0,4)+ "__" + time.substring(0, 8)
                     + "_" + pool.output.get(0).settings.outputFileNameNotes
                     + ".obj";
-            File file = new File(dirPath);
+            File file = new File(filePath);
             FileWriter writer = new FileWriter(file);
-            System.out.println("\n" + dirPath);
+            System.out.println("\n" + filePath);
 
             int cnt = 0;
             int Vcnt = 0;
@@ -68,11 +73,12 @@ public class ObjOutput {
 
                 Settings settings = offspring.settings;
                 writer.write("# -hephaestus " + "offspring_" + cnt + "\n");
+                writer.write("#  dob-date:" + date + "-time:" + time + "\n");
                 String fileList = "";
-                for (String fileUsed : offspring.filesUsed){
-                    fileList = fileList.concat(", " + fileUsed);
+                for (int i = 0; i < offspring.filesUsed.size(); i++){
+                    fileList = fileList.concat("#             parent{" + i + "} =" + offspring.filesUsed.get(i) + "\n");
                 }
-                writer.write("# Lineage, " + fileList + "\n");
+                writer.write(fileList);
                 writer.write("#                moved " + " x:" + (offspring.moved[0])
                         + " y:" + (offspring.moved[1])
                         + " z:" + (offspring.moved[2]) + "\n");
@@ -80,12 +86,18 @@ public class ObjOutput {
                         + " y:" + (offspring.moved[4])
                         + " z:" + (offspring.moved[5]) + "\n");
                 writer.write("#                                               \n");
-                writer.write("#   removeUsedVertices " + settings.removeUsedVertices + "\n");
+                writer.write("#    " + settings.removeUsedVertices + "\n");
+                writer.write("#             nearestV " + settings.nearestVertice + "\n");
+                writer.write("#             nearestS " + settings.nearestSurface + "\n");
+                writer.write("#                ratio " + settings.ratio + "\n");
+                writer.write("#        iterate ratio " + settings.iterateRatio + "\n");
+                writer.write("#             decimate " + settings.decimate + "\n");
                 writer.write("#     standardizeScale " + settings.standardizeScale + "\n");
                 writer.write("#        centerObjects " + settings.centerObjects + "\n");
+                writer.write("#        vertexNormals " + settings.VertexNormals + "\n");
+                writer.write("#   removeUsedVertices " + settings.removeUsedVertices + "\n");
                 writer.write("# prioritizeByDistance " + settings.prioritizeByDistance + "\n");
-                writer.write("#        VertexNormals " + settings.VertexNormals + "\n");
-                writer.write("o " + runCnt + "_" + cnt + "__ '" + date.substring(5,10) + "_" + date.substring(0,4)+ "'_" + time.substring(0, 8) + "\n");
+                writer.write("o " + runCnt + "_" + cnt + "__ " + date.substring(5,10) + "_" + date.substring(0,4)+ "_" + time.substring(0, 8) + "\n");
 
                 // MTL file name
                 writer.write("mtllib " + offspring.MtlName + "\n");
@@ -135,8 +147,8 @@ public class ObjOutput {
                 }
                 Vcnt += vs;
                 cnt++;
-                seperate[0] += 2;
-                retainCorrectMove[0] += 2;
+                seperate[0] += settings.separationDistanceX;
+                retainCorrectMove[0] += settings.separationDistanceX;
                 pb1.step();
 
 
@@ -150,18 +162,20 @@ public class ObjOutput {
                 info = info.concat("              rotated " + " x:" + (offspring.moved[3])
                         + " y:" + (offspring.moved[4])
                         + " z:" + (offspring.moved[5]) + "\n");
-                info = info.concat("                                               \n");
-                info = info.concat("   removeUsedVertices " + settings.removeUsedVertices + "\n");
-                info = info.concat("     standardizeScale " + settings.standardizeScale + "\n");
-                info = info.concat("        centerObjects " + settings.centerObjects + "\n");
-                info = info.concat(" prioritizeByDistance " + settings.prioritizeByDistance + "\n");
-                info = info.concat("        VertexNormals " + settings.VertexNormals + "\n");
+                info = info.concat("             filepath " + filePath + "\n");
+                info = info.concat("                ratio " + offspring.settings.ratio + "\n");
+                info = info.concat("   removeUsedVertices " + offspring.settings.removeUsedVertices + "\n");
+                info = info.concat("     standardizeScale " + offspring.settings.standardizeScale + "\n");
+                info = info.concat("        centerObjects " + offspring.settings.centerObjects + "\n");
+                info = info.concat(" prioritizeByDistance " + offspring.settings.prioritizeByDistance + "\n");
+                info = info.concat("        VertexNormals " + offspring.settings.VertexNormals + "\n");
                 info = info.concat("\n");
                 pool.logText.add(info);
             }
 
             writer.flush();
             writer.close();
+            pool.output.clear();
         } catch (IOException e) {
             e.printStackTrace();
         }
