@@ -149,11 +149,12 @@ public class Settings {
         System.out.println("[2] closest surface point");
         System.out.println("[3] decimate");
         System.out.println("*");
-        System.out.println("[4] ratio iterate");
+        System.out.println("[4] iterate ratio");
         System.out.println("[5] reverse run");
         System.out.println("[6] manual wellsprings");
         System.out.println("*");
         System.out.println("[7] no saving");
+        System.out.println("****");
         System.out.print("inputs:");
 
         Scanner keyboard = new Scanner(System.in);

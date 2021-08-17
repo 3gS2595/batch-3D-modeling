@@ -21,6 +21,7 @@ public class Main {
 		pool.writeInfoFile();
 	}
 
+	int runCnt = 0;
 	void runSingl(ThreadPool pool) {
 		if (pool.setting.decimate) {
 			Settings.printSettingsSingle(pool.setting);
@@ -40,27 +41,26 @@ public class Main {
 				}
 				// saving file
 				pool.output.addAll(pool.setting.wellsprings);
-				if(pool.setting.saveOutput) ObjOutput.output(pool, savepb, 0);
+				if(pool.setting.saveOutput) ObjOutput.output(pool, savepb, runCnt);
 				pool.setting.groupStep[1] += pool.setting.separationDistanceY;
 			}
 		}
+		runCnt++;
 	}
 
 	boolean reverseRun = false;
-	double initialStep = -777;
-	int runCnt = 1;
+	double initialStep = Double.MAX_VALUE;
 	void runGroup(ThreadPool pool) {
 		if (pool.setting.nearestVertice || pool.setting.nearestSurface) {
 			pool.setting.group();
 			Settings.printSettingsGroup(pool.setting);
 
-			if(initialStep == -777) initialStep = pool.setting.groupStep[1];
+			if(initialStep == Double.MAX_VALUE) initialStep = pool.setting.groupStep[1];
 			if(pool.setting.reversedRepeat && reverseRun){
 				pool.setting.groupStep[1] = initialStep;
-				double[] ro = new double[]{0.0,0.0,180.0};
+				double[] ro = new double[]{0,0,180};
 				for(int i =0; i < pool.setting.workingSet.size(); i++){
 					pool.setting.workingSet.get(i)[1].rotate(ro);
-					pool.setting.workingSet.get(i)[1].buildTree();
 					// separates repeat from first pass
 					pool.setting.groupStep[0] +=
 							pool.setting.separationDistanceX * pool.setting.iterationCnt
@@ -74,7 +74,6 @@ public class Main {
 				String filesUsed = "";
 				for (String file : springPair[0].filesUsed) filesUsed = filesUsed.concat(", " + file);
 				System.out.println("_r" + runCnt + " " + filesUsed);
-
 
 				// pb declare
 				double vertCnt = springPair[0].v.size() * springPair[0].settings.iterationCnt;
@@ -97,11 +96,6 @@ public class Main {
 			}
 		}
 		if(pool.setting.reversedRepeat && !reverseRun){
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 			reverseRun = true;
 			runGroup(pool);
 		}

@@ -154,6 +154,7 @@ public class Form {
 				v.set(i, corrected);
 			}
 		}
+		this.buildTree();
 		this.moved[0] += amount[0];
 		this.moved[1] += amount[1];
 		this.moved[2] += amount[2];
@@ -217,5 +218,6 @@ public class Form {
 			prime[2] = (x * tranM[2][0]) + (y * tranM[2][1]) + (z * tranM[2][2]) + (1 * tranM[2][3]);
 			this.v.set(i, new double[]{prime[0], prime[1], prime[2]});
 		}
+		this.buildTree();
 	}
 }
