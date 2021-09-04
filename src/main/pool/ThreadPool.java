@@ -5,6 +5,7 @@ import main.form.Form;
 import main.tasks.*;
 import main.tasks.other.PrioritizeDistance;
 import main.tasks.other.RemoveUsedTree;
+import main.tools.SetUp;
 import me.tongfei.progressbar.ProgressBar;
 
 import java.io.File;
@@ -17,8 +18,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class ThreadPool extends Thread{
     public Settings setting;
     public Form[] pairSpring;
-    public List<Form> output = new ArrayList<>();
-    public List<String> logText = new ArrayList<>();
+    public List<Form[]>  workingSet = new ArrayList<>();
+    public List<Form>        output = new ArrayList<>();
+    public List<String>     logText = new ArrayList<>();
 
     // Book keeping
     // private static final LinkedList<Task>  priority = new LinkedList<>();
@@ -65,6 +67,9 @@ public class ThreadPool extends Thread{
             else if (this.output.get(offIndex).settings.nearestSurface)
                 execute(new NearestSurface(i, offIndex, this));
 
+            else if (this.output.get(offIndex).settings.nearestSurfaceProj)
+                execute(new NearestProjectionSurface(i, offIndex, this));
+
             else if (this.output.get(offIndex).settings.removeUsedVertices)
                 execute(new RemoveUsedTree(i, this));
 
@@ -91,6 +96,13 @@ public class ThreadPool extends Thread{
         }
     }
 
+    // could output single run into working set, and then use that as input to get (grouped) working set
+    public void group(){
+        SetUp setup = new SetUp();
+        this.workingSet = setup.group(this.setting);
+        this.setting.groupCnt = workingSet.size();
+    }
+
     public void writeInfoFile() {
         try {
             String dirPath = this.setting.outputFolder + "infoFile" + ".txt";
@@ -104,11 +116,8 @@ public class ThreadPool extends Thread{
     }
 
     void setMove(int offIndex, Form[] parent){
-        this.output.get(offIndex).moved[0] = parent[0].moved[0];
-        this.output.get(offIndex).moved[1] = parent[0].moved[1];
-        this.output.get(offIndex).moved[2] = parent[0].moved[2];
-        this.output.get(offIndex).moved[3] = parent[1].moved[3];
-        this.output.get(offIndex).moved[4] = parent[1].moved[4];
-        this.output.get(offIndex).moved[5] = parent[1].moved[5];
+        for(Form cur : parent) {
+            this.output.get(offIndex).parentInfo.put(cur.ObjName, cur.moved);
+        }
     }
 }

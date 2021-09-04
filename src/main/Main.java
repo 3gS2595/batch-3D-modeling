@@ -5,9 +5,13 @@ import main.tools.ObjOutput;
 import main.pool.ThreadPool;
 import me.tongfei.progressbar.ProgressBar;
 
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+
 
 public class Main {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
+
 		Main task = new Main();
 		Settings setting = new Settings();
 		task.run(setting);
@@ -48,40 +52,53 @@ public class Main {
 		runCnt++;
 	}
 
-	// reverse should output placing each correlating iteration with the other spaced as tuples etc
+	// reverse run logs
 	boolean reverseRun = false;
-	double[] move0 = new double[7];
-	double[] move1 = new double[7];
+	double initRatio;
+	ArrayList<double[]> moves = new ArrayList<>();
 	double initialStep = Double.MAX_VALUE;
+
 	void runGroup(ThreadPool pool) {
-		if (pool.setting.nearestVertice || pool.setting.nearestSurface) {
-			pool.setting.group();
-			if(!reverseRun) System.arraycopy(pool.setting.workingSet.get(0)[0].moved, 0, move0, 0, pool.setting.workingSet.get(0)[0].moved.length);
-			if(!reverseRun) System.arraycopy(pool.setting.workingSet.get(0)[1].moved, 0, move1, 0, pool.setting.workingSet.get(0)[1].moved.length);
+		if (pool.setting.nearestVertice || pool.setting.nearestSurface || pool.setting.nearestSurfaceProj) {
+			pool.group();
 			Settings.printSettingsGroup(pool.setting);
 
-			// configuring run REPEAT
+			// reverse run configuration
+			if(!reverseRun && pool.workingSet.size() != 0) {
+				initRatio = pool.setting.ratio;
+				for(Form cur : pool.workingSet.get(0)){
+					moves.add(new double[7]);
+					System.arraycopy(cur.moved, 0, moves.get(moves.size()-1), 0, cur.moved.length);
+				}
+			}
 			if(initialStep == Double.MAX_VALUE) initialStep = pool.setting.groupStep[1];
 			if(pool.setting.reversedRepeat && reverseRun){
 				pool.setting.groupStep[1] = initialStep;
-				double[] ro = new double[]{0,0,180};
-				for(int i =0; i < pool.setting.workingSet.size(); i++){
-					pool.setting.workingSet.get(i)[1].rotate(ro);
-					// separates repeat from first pass
-					pool.setting.groupStep[0] +=
-							pool.setting.separationDistanceX * pool.setting.iterationCnt
-							+ (pool.setting.separationDistanceX / 2);
-					pool.setting.workingSet.get(i)[0].moved = move0;
-					pool.setting.workingSet.get(i)[1].moved = move1;
+				double[] ro = new double[]{0,180,0};
+				for(int i =0; i < pool.workingSet.size(); i++){
+					pool.setting.ratio = initRatio;
+					moves.get(1)[4] += 180;
+					pool.workingSet.get(i)[1].rotate(ro);
+					for(int x = 0; x < pool.workingSet.get(i).length; x ++)
+						for(int m = 0; m < moves.size(); m++)
+							pool.workingSet.get(i)[m].parentInfo.replace(pool.workingSet.get(i)[m].ObjName, moves.get(m));
+
+					pool.setting.groupStep[0] =
+							(pool.setting.separationDistanceX * pool.setting.iterationCnt)
+							+
+							(pool.setting.separationDistanceX / 2);
 				}
 
 			}
 
 			// coupling iterate
-			for (Form[] springPair : pool.setting.workingSet) {
+			for (Form[] springPair : pool.workingSet) {
 
 				String filesUsed = "";
-				for (String file : springPair[0].filesUsed) filesUsed = filesUsed.concat(", " + file);
+				for (String file : springPair[0].parentInfo.keySet()) {
+					String[] temp = file.split("/");
+					filesUsed = filesUsed.concat(", " + temp[temp.length-1]);
+				}
 				System.out.println("_r" + runCnt + " " + filesUsed);
 
 				// pb declare
@@ -91,13 +108,14 @@ public class Main {
 					prod.setExtraMessage((1) + "/" + pool.setting.iterationCnt);
 
 					// commands run
-					if(pool.setting.iterateRatio) springPair[0].settings.ratio = 0;
+					if(pool.setting.iterateRatio) springPair[0].settings.ratio = springPair[0].settings.minRatio;
 					for (double i = 0; i < pool.setting.iterationCnt; i++) {
 						Form.step(springPair);
 						pool.initializeTaskGroup(springPair);
 						pool.run(prod);
 					}
 					// saving file
+					System.out.println();
 					if(pool.setting.saveOutput) ObjOutput.output(pool, save, runCnt);
 					pool.setting.groupStep[1] += pool.setting.separationDistanceY;
 					runCnt++;
@@ -120,6 +138,18 @@ public class Main {
 		System.out.format("runtime-%d.%dm", m, s);
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

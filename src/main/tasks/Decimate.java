@@ -28,7 +28,8 @@ import java.util.List;
 
             double midpointRatio = 0.5;
             // salience found in the leaves of a tree
-            for(int i = 0, j = wellspring.f.size(); i < j; i++) {
+            int j = wellspring.f.size();
+            for(int i = 0; i < j; i++) {
                 double edgLenAvrg = 0;
                 // gets indices used in triangle
                 // places them in triVrts
@@ -109,11 +110,6 @@ import java.util.List;
                         wellspring.f.add(tempF);
                         newPointsCnt = newPointsCnt + 3;
                         edgecnt += 3;
-                    } else {
-                        // TODO this causes issues in DECIMATE
-                        // TODO this is most likely do to the tri raws not being populated
-                        pool.output.get(offIndex).newFaces.put(new Integer[]{triRawvIndices.get(0), triRawvIndices.get(1), triRawvIndices.get(2)}, 1);
-                        edgecnt += 1;
                     }
                 } else {
                         System.out.println("CARE FULL-NON-TRIANGLE");

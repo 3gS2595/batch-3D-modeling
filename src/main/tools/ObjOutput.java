@@ -5,9 +5,7 @@ import main.Settings;
 import main.pool.ThreadPool;
 import me.tongfei.progressbar.ProgressBar;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -21,10 +19,7 @@ public class ObjOutput {
                 + settings.outputFileNameNotes + "/";
         dirPath = dirPath.replace("\\", "/");
         File file = new File(dirPath);
-
         if(settings.saveOutput) {
-
-            //Creating the directory
             boolean bool = file.mkdir();
             if (bool) {
                 return dirPath;
@@ -38,12 +33,10 @@ public class ObjOutput {
 
     public static void output(ThreadPool pool, ProgressBar pb1, int runCnt) {
         try {
-//            if (pool.output.get(0).settings.VertexNormals) pool.output.get(0).calculateNormals();
-
+            // if (pool.output.get(0).settings.VertexNormals) pool.output.get(0).calculateNormals();
             // names file based on time-date
             String time = (java.time.LocalTime.now() + "").replace(':', '_');
             String date = (java.time.LocalDate.now() + "").replace('-', '_');
-            System.out.println(pool.output.get(0).settings.outputFolder);
             String filePath = pool.output.get(0).settings.outputFolder
                     +  runCnt + "_" + date.substring(5,10) + "_" + date.substring(0,4)+ "__" + time.substring(0, 8)
                     + "_" + pool.output.get(0).settings.outputFileNameNotes
@@ -57,10 +50,6 @@ public class ObjOutput {
             int VNcnt = 0;
             double[] seperate = {0,0,0};
 
-            // accounts for movement change introduced
-            // by separating forms in current series
-            double[] retainCorrectMove = {0,0,0};
-
             pb1.setExtraMessage(runCnt + ",_" + date.substring(5,10) + "_" + date.substring(0,4)+ "__" + time.substring(0, 8));
             for (Form offspring : pool.output) {
                 // Prints .obj
@@ -69,22 +58,25 @@ public class ObjOutput {
                 offspring.centerObject();
                 offspring.translate(pool.output.get(0).settings.groupStep);
                 offspring.translate(seperate);
-                offspring.moved[0] -= retainCorrectMove[0];
 
                 Settings settings = offspring.settings;
                 writer.write("# -hephaestus " + "offspring_" + cnt + "\n");
                 writer.write("#  dob-date:" + date + "-time:" + time + "\n");
                 String fileList = "";
-                for (int i = 0; i < offspring.filesUsed.size(); i++){
-                    fileList = fileList.concat("#             parent{" + i + "} =" + offspring.filesUsed.get(i) + "\n");
+                int keyCnt = 0;
+                for(String key : offspring.parentInfo.keySet()){
+                    String[] fileName = key.split("/");
+                    fileList = fileList.concat("#             parent{" + keyCnt + "} =" + fileName[fileName.length-1] + "\n");
+                    fileList = fileList.concat("#                        " + key + "\n");
+                    fileList = fileList.concat("#                      " + " x:" + (offspring.parentInfo.get(key)[0])
+                            + " y:" + (offspring.parentInfo.get(key)[1])
+                            + " z:" + (offspring.parentInfo.get(key)[2]) + "\n");
+                    fileList = fileList.concat("#                      " + " x:" + offspring.parentInfo.get(key)[3]
+                            + " y:" + (offspring.parentInfo.get(key)[4])
+                            + " z:" + (offspring.parentInfo.get(key)[5]) + "\n");
+                    keyCnt++;
                 }
                 writer.write(fileList);
-                writer.write("#                moved " + " x:" + (offspring.moved[0])
-                        + " y:" + (offspring.moved[1])
-                        + " z:" + (offspring.moved[2]) + "\n");
-                writer.write("#              rotated " + " x:" + (offspring.moved[3])
-                        + " y:" + (offspring.moved[4])
-                        + " z:" + (offspring.moved[5]) + "\n");
                 writer.write("#                                               \n");
                 writer.write("#    " + settings.removeUsedVertices + "\n");
                 writer.write("#             nearestV " + settings.nearestVertice + "\n");
@@ -145,32 +137,42 @@ public class ObjOutput {
                         writer.write(f);
                     }
                 }
+
+                // infoFile.txt entry
+                String info = runCnt + "_" + cnt + "__ '" + date.substring(5,10) + "_" + date.substring(0,4)+ "_" + time.substring(0, 8) + "\n";
+                info = info.concat("                inside =" + filePath + "\n");
+                info = info.concat("              siblings =" + pool.output.size() + "\n");
+                info = info.concat("                 ratio " + offspring.settings.ratio + "\n");
+                info = info.concat("    removeUsedVertices " + offspring.settings.removeUsedVertices + "\n");
+                info = info.concat("      standardizeScale " + offspring.settings.standardizeScale + "\n");
+                info = info.concat("         centerObjects " + offspring.settings.centerObjects + "\n");
+                info = info.concat("  prioritizeByDistance " + offspring.settings.prioritizeByDistance + "\n");
+                info = info.concat("         VertexNormals " + offspring.settings.VertexNormals + "\n");
+                keyCnt = 0;
+                for(String key : offspring.parentInfo.keySet()){
+                    System.out.println();
+                    for( int x = 0; x <  offspring.parentInfo.get(key).length; x++) {
+                        System.out.println(key + " " + offspring.parentInfo.get(key)[x]);
+                    }
+                    info = info.concat("              parent{" + keyCnt + "} =" + key + "\n");
+                    info = info.concat("                      "
+                            + " x:" + offspring.parentInfo.get(key)[0]
+                            + " y:" + offspring.parentInfo.get(key)[1]
+                            + " z:" + offspring.parentInfo.get(key)[2] + "\n");
+                    info = info.concat("                      "
+                            + " rx:" + offspring.parentInfo.get(key)[3]
+                            + " ry:" + offspring.parentInfo.get(key)[4]
+                            + " rz:" + offspring.parentInfo.get(key)[5] + "\n");
+                    keyCnt++;
+                }
+                info = info.concat("\n\n");
+                pool.logText.add(info);
+
+                // end of output book keeping
                 Vcnt += vs;
                 cnt++;
                 seperate[0] += settings.separationDistanceX;
-                retainCorrectMove[0] += settings.separationDistanceX;
                 pb1.step();
-
-
-                String info = runCnt + "_" + cnt + "__ '" + date.substring(5,10) + "_" + date.substring(0,4)+ "_" + time.substring(0, 8) + "\n";
-                for (int i = 0; i < offspring.filesUsed.size(); i++){
-                    info = info.concat("            parent{" + i + "} =" + offspring.filesUsed.get(i) + "\n");
-                }
-                info = info.concat("                moved " + " x:" + (offspring.moved[0])
-                        + " y:" + (offspring.moved[1])
-                        + " z:" + (offspring.moved[2]) + "\n");
-                info = info.concat("              rotated " + " x:" + (offspring.moved[3])
-                        + " y:" + (offspring.moved[4])
-                        + " z:" + (offspring.moved[5]) + "\n");
-                info = info.concat("             filepath " + filePath + "\n");
-                info = info.concat("                ratio " + offspring.settings.ratio + "\n");
-                info = info.concat("   removeUsedVertices " + offspring.settings.removeUsedVertices + "\n");
-                info = info.concat("     standardizeScale " + offspring.settings.standardizeScale + "\n");
-                info = info.concat("        centerObjects " + offspring.settings.centerObjects + "\n");
-                info = info.concat(" prioritizeByDistance " + offspring.settings.prioritizeByDistance + "\n");
-                info = info.concat("        VertexNormals " + offspring.settings.VertexNormals + "\n");
-                info = info.concat("\n");
-                pool.logText.add(info);
             }
 
             writer.flush();

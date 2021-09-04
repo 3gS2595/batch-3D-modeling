@@ -3,10 +3,8 @@ package main.form;
 import main.Settings;
 import org.tinspin.index.qthypercube2.QuadTreeKD2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.lang.reflect.Type;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import static main.tools.ObjIntake.intake;
 
@@ -37,8 +35,8 @@ public class Form {
 	public ConcurrentHashMap<Integer[],Integer> newFaces   = new ConcurrentHashMap<>();
 
 	// record keeping
-	public List<String>       filesUsed = new ArrayList<>();
-	public double[] moved = {0,0,0,0,0,0,0}; // variable used during moving
+	public HashMap<String, double[]> parentInfo = new HashMap<>();
+	public double[] moved = {0,0,0,0,0,0}; // variable used during moving
 
 
 
@@ -56,7 +54,6 @@ public class Form {
 		if (this.settings.standardizeScale) this.standardizeScale();
 
 		this.buildTree();
-		this.filesUsed.add(this.ObjName);
 	}
 
 	// used to make basis for offspring
@@ -72,11 +69,13 @@ public class Form {
 		this.vn = new ArrayList<>(form.vn);
 		this.rawf = new ArrayList<>(form.rawf);
 		this.f = new ArrayList<>(form.f);
-		this.filesUsed = new ArrayList<>(form.filesUsed);
 		this.KdTree = form.KdTree;
 		this.siblingPolys = form.siblingPolys;
-		this.moved = new double[form.moved.length];
-		System.arraycopy(form.moved, 0, this.moved, 0, form.moved.length);
+		for (Map.Entry<String, double[]> entry : form.parentInfo.entrySet()) {
+			double[] arrayCopy = new double[entry.getValue().length];
+			System.arraycopy(entry.getValue(), 0, arrayCopy, 0, entry.getValue().length);
+			this.parentInfo.put(entry.getKey(), arrayCopy);
+		}
 	}
 
 	public void buildTree() {
@@ -86,20 +85,35 @@ public class Form {
 		}
 	}
 
-	// moves the form before each iteration
+	// modulates iterational lip
 	public static void step(Form[] wellspring){
 		double[] step = new double[]{
-				wellspring[0].settings.moveStep[0],
-				wellspring[0].settings.moveStep[1],
-				wellspring[0].settings.moveStep[2]};
-		wellspring[0].translate(step);
+				wellspring[1].settings.moveStep[0],
+				wellspring[1].settings.moveStep[1],
+				wellspring[1].settings.moveStep[2]};
+		double[] m0 = new double[wellspring[0].parentInfo.get(wellspring[0].ObjName).length];
+		System.arraycopy(wellspring[0].parentInfo.get(wellspring[0].ObjName), 0, m0, 0,wellspring[0].parentInfo.get(wellspring[0].ObjName).length);
+
+		double[] m1 = new double[wellspring[0].parentInfo.get(wellspring[1].ObjName).length];
+		System.arraycopy(wellspring[0].parentInfo.get(wellspring[1].ObjName), 0, m1, 0,wellspring[0].parentInfo.get(wellspring[1].ObjName).length);
+
+		wellspring[1].translate(step);
+		m1[0] += wellspring[1].settings.moveStep[0];
+		m1[1] += wellspring[1].settings.moveStep[1];
+		m1[2] += wellspring[1].settings.moveStep[2];
+
 		wellspring[1].rotate(wellspring[1].settings.tempRotate);
-		wellspring[0].moved[0] += wellspring[0].settings.moveStep[0];
-		wellspring[0].moved[1] += wellspring[0].settings.moveStep[1];
-		wellspring[0].moved[2] += wellspring[0].settings.moveStep[2];
-		wellspring[1].moved[3] += wellspring[0].settings.tempRotate[0];
-		wellspring[1].moved[4] += wellspring[0].settings.tempRotate[1];
-		wellspring[1].moved[5] += wellspring[0].settings.tempRotate[2];
+		m1[3] += wellspring[0].settings.tempRotate[0];
+		m1[4] += wellspring[0].settings.tempRotate[1];
+		m1[5] += wellspring[0].settings.tempRotate[2];
+
+		wellspring[0].parentInfo.replace(wellspring[0].ObjName, m0);
+		wellspring[0].parentInfo.replace(wellspring[1].ObjName, m1);
+		wellspring[1].parentInfo.replace(wellspring[0].ObjName, m0);
+		wellspring[1].parentInfo.replace(wellspring[1].ObjName, m1);
+//		System.out.println(wellspring[1].parentInfo.get(wellspring[1].ObjName)[4]);
+
+
 		if(wellspring[0].settings.iterateRatio){
 			wellspring[0].settings.ratio += wellspring[0].settings.moveStep[3];
 		}

@@ -74,7 +74,7 @@ public class ObjIntake {
                             form.rawf.add(line);
 
                             // populates vertex sibling points 'siblingPoints'
-                            if(form.settings.nearestSurface) {
+                            if(form.settings.nearestSurface || form.settings.nearestSurfaceProj) {
                                 for(int vertexIndex : vIndices) {
                                     if (!form.siblingPolys.containsKey(vertexIndex)) {
                                         List<List<Integer>> t = new ArrayList<>();
