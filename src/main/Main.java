@@ -1,6 +1,8 @@
 package main;
 
 import main.form.Form;
+import main.tasks.miscel.ImageCollect;
+import main.tasks.miscel.txtFileCollector;
 import main.tools.ObjOutput;
 import main.pool.ThreadPool;
 import me.tongfei.progressbar.ProgressBar;
@@ -20,6 +22,7 @@ public class Main {
 
 	void run(Settings settings) {
 		ThreadPool pool = new ThreadPool(settings);
+		runMaintenance(pool);
 		runSingl(pool);
 		runGroup(pool);
 		pool.writeInfoFile();
@@ -88,7 +91,6 @@ public class Main {
 							+
 							(pool.setting.separationDistanceX / 2);
 				}
-
 			}
 
 			// coupling iterate
@@ -128,6 +130,16 @@ public class Main {
 		}
 	}
 
+	void runMaintenance(ThreadPool pool){
+		if (pool.setting.imageCollect) {
+			ImageCollect imgCollect = new ImageCollect();
+			imgCollect.run();
+		}
+		if (pool.setting.txtCollect) {
+			txtFileCollector txtCollect = new txtFileCollector();
+			txtCollect.run();
+		}
+	}
 	long startTime = time();
 	long time() {
 		return System.currentTimeMillis();

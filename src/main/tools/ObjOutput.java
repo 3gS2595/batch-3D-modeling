@@ -109,6 +109,7 @@ public class ObjOutput {
                 writer.write("s off\n");
                 writer.write("g objects\n");
 
+                System.out.println("f");
                 // F
                 if(offspring.f.size() > 0){
                     for (List<Integer> cv : offspring.f) {
@@ -150,10 +151,10 @@ public class ObjOutput {
                 info = info.concat("         VertexNormals " + offspring.settings.VertexNormals + "\n");
                 keyCnt = 0;
                 for(String key : offspring.parentInfo.keySet()){
-                    System.out.println();
-                    for( int x = 0; x <  offspring.parentInfo.get(key).length; x++) {
-                        System.out.println(key + " " + offspring.parentInfo.get(key)[x]);
-                    }
+//                    System.out.println();
+//                    for( int x = 0; x <  offspring.parentInfo.get(key).length; x++) {
+//                        System.out.println(key + " " + offspring.parentInfo.get(key)[x]);
+//                    }
                     info = info.concat("              parent{" + keyCnt + "} =" + key + "\n");
                     info = info.concat("                      "
                             + " x:" + offspring.parentInfo.get(key)[0]

@@ -28,12 +28,12 @@ public class Standard implements Task {
         Collection<QEntryDist<Object>> nearestNeighbor = pairSpring[1].KdTree.knnQuery(pairSpring[0].v.get(i), 1);
         double[] closeV = ((QEntry)nearestNeighbor.toArray()[0]).point();
 
-        // produces distance to nn
+        // calculates distance to nn
         double num = 0;
         for (int z = 0; z < pairSpring[0].v.get(i).length; z++) num += Math.pow((pairSpring[0].v.get(i)[z] - closeV[z]), 2);
         double distance = Math.sqrt(num);
 
-        // produces midpoint
+        // calculates cartesian point
         double ratio = (pairSpring[0].settings.ratio * distance)/distance;
         double[] midpoint = new double[closeV.length];
         for(int a = 0; a < pairSpring[0].v.get(i).length; a++) {

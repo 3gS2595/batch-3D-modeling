@@ -16,12 +16,15 @@ public class Form {
 	public String MtlName = null;
 	public Settings settings;
 	public QuadTreeKD2<Object> KdTree = QuadTreeKD2.create(3);
+	public QuadTreeKD2<Object> newPointss = QuadTreeKD2.create(3);
+
 
 	// file input
-	public List<double[]>     v = new ArrayList<>();
+	public ArrayList<double[]>     v = new ArrayList<>();
 	public List<double[]>    vn = new ArrayList<>();
 	public List<String>    rawf = new ArrayList<>();
 	public List<List<Integer>>f = new ArrayList<>();
+	public List<List<Integer>>newf = new ArrayList<>();
 	public List<Material>  mats = new ArrayList<>();
 
 	// normal averaging ;unless optioned untouched
@@ -79,6 +82,7 @@ public class Form {
 	}
 
 	public void buildTree() {
+		this.KdTree.clear();
 		this.KdTree = QuadTreeKD2.create(3);
 		for(int i = 0; i < this.v.size(); i++){
 			this.KdTree.insert(new double[]{this.v.get(i)[0], this.v.get(i)[1], this.v.get(i)[2]}, i);

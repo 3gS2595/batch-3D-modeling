@@ -3,6 +3,7 @@ package main.pool;
 import main.Settings;
 import main.form.Form;
 import main.tasks.*;
+import main.tasks.miscel.ImageCollect;
 import main.tasks.other.PrioritizeDistance;
 import main.tasks.other.RemoveUsedTree;
 import main.tools.SetUp;
@@ -50,7 +51,14 @@ public class ThreadPool extends Thread{
     public void initializeTaskSingle(Form parent) {
         // vertex' taskX
         if (parent.settings.decimate) {
-            execute(new Decimate(parent, this));
+//            int offset = parent.v.size();
+//            for(int i = 0, j = parent.v.size(); i < j; i++) {
+                execute(new Decimate(parent, this));
+//            }
+        }
+        if(parent.settings.imageCollect){
+            execute(new ImageCollect());
+            System.out.println("image collection complete");
         }
     }
 
@@ -79,7 +87,7 @@ public class ThreadPool extends Thread{
         setMove(offIndex, parent);
     }
 
-    void execute(Task task) {
+    public void execute(Task task) {
         synchronized (queue) {
             queue.add(task);
             queue.notify();

@@ -7,19 +7,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Settings {
+//TODO peak priori
+//  decimate full canonization in point cloud density
+//  infoText deep errorless recollection
 
-    //TODO write move and rotation for both parents in infoFile.
-    // place reverse run iteration next to their counterparts
-    // an array of ratio values to run for each correlating iteration
-    // nomenclature based on current population of the output folder
-    //      finds what numbers have been used and adds to the last ( or fills gaps)
-    // KNOWN BUGS
-        // decimate produces a handful of 0 points only on complex meshes
-        // decimate seems to be  fully broken
+//TODO non manifold geometry decimation support
+// the reason things were done the way they were was to avoid having repeat vertices on parallel edges
+// hashmap including coordinates of new points may be worth while
+
+
+//TODO write move and rotation for both parents in infoFile.
+// place reverse run iteration next to their counterparts
+// an array of ratio values to run for each correlating iteration
+// nomenclature based on current population of the output folder
+//      finds what numbers have been used and adds to the last ( or fills gaps)
+// rerun seems fully broken, check on ratio
+// KNOWN BUGS
+// decimate produces a handful of 0 points only on complex meshes (haven't seen this recently possible rc issue
+// decimate seems to be  fully broken
+
+
+public  class Settings {
 
     // hardware
-        public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\input\\sticks";
+    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\input\\sticks";
     public String          outputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\output";
     public String   outputFileNameNotes = "cold_moon_brights_in_the_sun";
 
@@ -32,10 +43,10 @@ public class Settings {
 
     // render
     public double[]         maxDistance = {0,0,0};
-    public double[]            rotation = {0,360,0};
-    public double                 ratio = .2;
-    public double              minRatio = .1;
-    public int             iterationCnt = 5;
+    public double[]            rotation = {0,0,0};
+    public double                 ratio = .24;
+    public double              minRatio = .09;
+    public int             iterationCnt = 2;
     public boolean         iterateRatio = false;
     public boolean       reversedRepeat = false;
     public boolean     standardizeScale = true;
@@ -44,10 +55,14 @@ public class Settings {
     // optionals
     public boolean manualParentSelection = false;
     public double    separationDistanceX = 1;
-    public double    separationDistanceY = 1.2;
+    public double    separationDistanceY = .9;
     public boolean            saveOutput = true;
     public boolean          un_spinForms = true;
-    public int                threadCnt = 18;
+    public int                 threadCnt = 18;
+
+    // maintenance
+    public boolean         imageCollect = false;
+    public boolean           txtCollect = false;
 
 
 
@@ -108,7 +123,7 @@ public class Settings {
         this.nearestSurface = settings.nearestSurface;
         System.arraycopy(settings.maxDistance, 0, this.maxDistance, 0, settings.maxDistance.length);
         System.arraycopy(settings.rotation, 0, this.rotation, 0, settings.rotation.length);
-        this.ratio = 0+ settings.ratio;
+        this.ratio = 0+settings.ratio;
         this.iterationCnt = settings.iterationCnt;
         this.iterateRatio = settings.iterateRatio;
         this.reversedRepeat = settings.reversedRepeat;
@@ -136,18 +151,21 @@ public class Settings {
     public static void printSettingsGroup(Settings settings) {
         System.out.print("\n\n");
         System.out.print("          sum of the run " + settings.iterationCnt * settings.groupCnt + "\n");
+        System.out.print("               subgroups " + settings.groupCnt + "\n");
         System.out.print(" iterations per subgroup " + settings.iterationCnt + "\n");
         if(settings.iterateRatio){
             double step = (settings.ratio - settings.minRatio) / settings.iterationCnt;
             System.out.print("                   ratios\n");
             for(int i = 0; i < settings.iterationCnt; i++){
                 String num = String.format("%.4g%n", settings.minRatio + (settings.moveStep[3] * (i+1)));
-                System.out.print("                      i"+ i + " " + num + "");
+                System.out.print("                      i-"+ i + " " + num + "");
             }
         } else {
             System.out.print("                   ratio " + settings.minRatio + "\n");
         }
-        System.out.print("                decimate " + settings.decimate + "\n");
+        System.out.print("          nearestVertice " + settings.nearestVertice + "\n");
+        System.out.print("          nearestSurface " + settings.nearestSurface + "\n");
+        System.out.print("        standardizeScale " + settings.standardizeScale + "\n");
         System.out.print("           centerObjects " + settings.centerObjects + "\n");
         System.out.print("           vertexNormals " + settings.VertexNormals + "\n");
         System.out.print("terminus " + settings.outputFolder + "\n");
@@ -173,6 +191,7 @@ public class Settings {
 
 
     void optionSelection() {
+        System.out.println(this.inputFolder);
         System.out.println("[1] closest vertex");
         System.out.println("[2] closest surface point");
         System.out.println("[8] closest surface point");
@@ -184,6 +203,8 @@ public class Settings {
         System.out.println("[9] primary well designation");
         System.out.println("*");
         System.out.println("[7] no saving");
+        System.out.println("[9] congregate image");
+        System.out.println("[*] congregate texts");
         System.out.println("****");
         System.out.print("inputs:");
 
@@ -197,6 +218,8 @@ public class Settings {
         if(selection.contains("6")) this.manualParentSelection = true;
         if(selection.contains("7")) this.saveOutput = false;
         if(selection.contains("8")) this.nearestSurfaceProj = true;
+        if(selection.contains("9")) this.imageCollect = true;
+        if(selection.contains("*")) this.txtCollect = true;
         selection = selection.replaceAll("[0-9]","");
         selection = selection.replaceAll(" ", "_");
         selection = "__".concat(selection);
