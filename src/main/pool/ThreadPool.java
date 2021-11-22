@@ -49,11 +49,11 @@ public class ThreadPool extends Thread{
     }
 
     public void initializeTaskSingle(Form parent) {
-        // vertex' taskX
+        // vertex' task X
         if (parent.settings.decimate) {
+                execute(new Decimate(parent, this));
 //            int offset = parent.v.size();
 //            for(int i = 0, j = parent.v.size(); i < j; i++) {
-                execute(new Decimate(parent, this));
 //            }
         }
         if(parent.settings.imageCollect){

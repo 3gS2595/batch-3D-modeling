@@ -5,6 +5,9 @@ import main.pool.ThreadPool;
 
 import java.util.List;
 
+//todo  check for point pre-creation
+    //if (flag) skip pre existing vertex insertion , retrieve vertex index and insert new face
+
 public class DecimateThreaded implements Task {
     int i;
     int offIndex;
@@ -39,12 +42,15 @@ public class DecimateThreaded implements Task {
                         Math.pow((vertices[0][1] - vertices[1][1]), 2) +
                         Math.pow((vertices[0][2] - vertices[1][2]), 2);
             double distance = Math.sqrt(num);
-            // midpoint
+            // distance*ratio -> midpoint
             double ratio = (midpointRatio * distance)/distance;
             double[] midpoint0 = {
                     vertices[0][0] + (ratio*(vertices[1][0] - vertices[0][0])),
                     vertices[0][1] + (ratio*(vertices[1][1] - vertices[0][1])),
                     vertices[0][2] + (ratio*(vertices[1][2] - vertices[0][2]))};
+            if(form.newPoints.contains(midpoint0)) {
+                System.out.println("catch reused point");
+            }
             form.newPoints.put(offset, midpoint0);
 
             // 1->3
@@ -53,12 +59,15 @@ public class DecimateThreaded implements Task {
                         Math.pow((vertices[0][1] - vertices[2][1]), 2) +
                         Math.pow((vertices[0][2] - vertices[2][2]), 2);
             distance = Math.sqrt(num);
-            // midpoint
+            // distance*ratio -> midpoint
             ratio = (midpointRatio * distance)/distance;
             double[] midpoint1= new double[]{
                     vertices[0][0] + (ratio * (vertices[2][0] - vertices[0][0])),
                     vertices[0][1] + (ratio * (vertices[2][1] - vertices[0][1])),
                     vertices[0][2] + (ratio * (vertices[2][2] - vertices[0][2]))};
+            if(form.newPoints.contains(midpoint1)) {
+                System.out.println("catch reused point");
+            }
             form.newPoints.put( offset+1, midpoint1);
 
             // 2->3
@@ -67,14 +76,14 @@ public class DecimateThreaded implements Task {
                         Math.pow((vertices[1][1] - vertices[2][1]), 2) +
                         Math.pow((vertices[1][2] - vertices[2][2]), 2);
             distance = Math.sqrt(num);
-            // 2->3 midpoint
+            // distance*ratio -> midpoint
             ratio = (midpointRatio * distance)/distance;
             double[] midpoint2 = new double[]{
                     vertices[1][0] + (ratio * (vertices[2][0] - vertices[1][0])),
                     vertices[1][1] + (ratio * (vertices[2][1] - vertices[1][1])),
                     vertices[1][2] + (ratio * (vertices[2][2] - vertices[1][2]))};
             if(form.newPoints.contains(midpoint2)) {
-                System.out.println("catch resused point");
+                System.out.println("catch reused point");
             }
             form.newPoints.put(offset + 2, midpoint2);
 

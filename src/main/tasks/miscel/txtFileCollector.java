@@ -4,11 +4,9 @@ import main.tasks.Task;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+
 
 public class txtFileCollector implements Task {
 	String src = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\documentation_";
@@ -20,6 +18,12 @@ public class txtFileCollector implements Task {
 	@Override
 	public void run() {
 		try {
+			//deletes previous collection
+			File tempFile = new File(src + "\\" + dstFileName);
+			boolean exists = tempFile.exists();
+			if(exists)
+				Files.deleteIfExists(Paths.get(src + "\\" + dstFileName));
+
 			ArrayList<String> text = new ArrayList<>();
 			File dir = new File(src);
 			for (File file : dir.listFiles()) {
@@ -55,12 +59,6 @@ public class txtFileCollector implements Task {
 					fstream.close();
 					text.add(" \n\n\n");
 				}
-
-				//deletes previous collection
-				File tempFile = new File(src + "\\" + dstFileName);
-				boolean exists = tempFile.exists();
-				if(exists)
-					Files.deleteIfExists(Paths.get(src + "\\" + dstFileName));
 			}
 
 			//creates TXT.txt

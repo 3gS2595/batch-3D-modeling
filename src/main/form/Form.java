@@ -68,6 +68,7 @@ public class Form {
 		this.siblingPoints = form.siblingPoints;
 		this.settings = new Settings(form.settings);
 		this.settings.moveStep = form.settings.moveStep;
+		System.arraycopy(form.settings.moveStep, 0, this.settings.moveStep, 0, form.settings.moveStep.length);
 		this.v = new ArrayList<>(form.v);
 		this.vn = new ArrayList<>(form.vn);
 		this.rawf = new ArrayList<>(form.rawf);
@@ -116,7 +117,6 @@ public class Form {
 		wellspring[1].parentInfo.replace(wellspring[0].ObjName, m0);
 		wellspring[1].parentInfo.replace(wellspring[1].ObjName, m1);
 //		System.out.println(wellspring[1].parentInfo.get(wellspring[1].ObjName)[4]);
-
 
 		if(wellspring[0].settings.iterateRatio){
 			wellspring[0].settings.ratio += wellspring[0].settings.moveStep[3];

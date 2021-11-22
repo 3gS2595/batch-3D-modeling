@@ -3,17 +3,26 @@ import main.form.Form;
 import main.tools.ObjOutput;
 import main.tools.SetUp;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+//TODO pytorch3D migration
+// implementation gain
+//      mid iterative cycling visualization / allowing mid cycle selection recursive calling
+//      efficiency of tensor implementations
+//      most impactful implementation blossoming of AI
+//      single image form reconstruction
+//      broaden my python experience / general resume inflation
 
 //TODO peak priori
 //  decimate full canonization in point cloud density
 //  infoText deep errorless recollection
+//  deep thrive overhaul of iteration step/ move array
+//  save run preferences, only input if changing bool ?? questioning
 
 //TODO non manifold geometry decimation support
 // the reason things were done the way they were was to avoid having repeat vertices on parallel edges
-// hashmap including coordinates of new points may be worth while
+// hashmap including new point coordinates may be worth while
 
 
 //TODO write move and rotation for both parents in infoFile.
@@ -30,7 +39,7 @@ import java.util.Scanner;
 public  class Settings {
 
     // hardware
-    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\input\\sticks";
+    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\input\\cube";
     public String          outputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\output";
     public String   outputFileNameNotes = "cold_moon_brights_in_the_sun";
 
@@ -44,9 +53,9 @@ public  class Settings {
     // render
     public double[]         maxDistance = {0,0,0};
     public double[]            rotation = {0,0,0};
-    public double                 ratio = .24;
+    public double                 ratio = .44;
     public double              minRatio = .09;
-    public int             iterationCnt = 2;
+    public int             iterationCnt = 4;
     public boolean         iterateRatio = false;
     public boolean       reversedRepeat = false;
     public boolean     standardizeScale = true;
@@ -54,8 +63,8 @@ public  class Settings {
 
     // optionals
     public boolean manualParentSelection = false;
-    public double    separationDistanceX = 1;
-    public double    separationDistanceY = .9;
+    public double          separateDistX = 1.1;
+    public double          separateDistY = .4;
     public boolean            saveOutput = true;
     public boolean          un_spinForms = true;
     public int                 threadCnt = 18;
@@ -63,6 +72,7 @@ public  class Settings {
     // maintenance
     public boolean         imageCollect = false;
     public boolean           txtCollect = false;
+    public boolean            arrayCast = false;
 
 
 
@@ -90,7 +100,7 @@ public  class Settings {
     public List<Form>       wellsprings;
     public double[]          tempRotate = {0,0,0};   // variable used during moving might be worth it to test rotate
     public double[]            moveStep = {0,0,0,0}; // distance each iteration moves merge ratio@[3] ??
-    public double[]           groupStep = {0,0,0};
+    public double[]         groupStepBy = {0,0,0};
 
     public boolean        VertexNormals = false;
     public boolean     avgVertexNormals = false;
@@ -130,8 +140,8 @@ public  class Settings {
         this.standardizeScale = settings.standardizeScale;
         this.centerObjects = settings.centerObjects;
         this.manualParentSelection = settings.manualParentSelection;
-        this.separationDistanceX = settings.separationDistanceX;
-        this.separationDistanceY = settings.separationDistanceY;
+        this.separateDistX = settings.separateDistX;
+        this.separateDistY = settings.separateDistY;
         this.saveOutput = settings.saveOutput;
         this.un_spinForms = settings.un_spinForms;
         this.threadCnt = settings.threadCnt;
@@ -139,13 +149,14 @@ public  class Settings {
         this.wellsprings = settings.wellsprings;
         this.tempRotate = settings.tempRotate;
         this.moveStep = settings.moveStep;
-        this.groupStep = settings.groupStep;
+        this.groupStepBy = settings.groupStepBy;
         this.VertexNormals = settings.VertexNormals;
         this.avgVertexNormals = settings.avgVertexNormals;
         this.groupCnt = settings.groupCnt;
         this.removeUsedVertices = settings.removeUsedVertices;
         this.prioritizeByDistance = settings.prioritizeByDistance;
         this.nearestSurfaceProj = settings.nearestSurfaceProj;
+        this.arrayCast = settings.arrayCast;
     }
 
     public static void printSettingsGroup(Settings settings) {
@@ -205,6 +216,7 @@ public  class Settings {
         System.out.println("[7] no saving");
         System.out.println("[9] congregate image");
         System.out.println("[*] congregate texts");
+        System.out.println("[`] congregate texts");
         System.out.println("****");
         System.out.print("inputs:");
 
@@ -220,6 +232,7 @@ public  class Settings {
         if(selection.contains("8")) this.nearestSurfaceProj = true;
         if(selection.contains("9")) this.imageCollect = true;
         if(selection.contains("*")) this.txtCollect = true;
+        if(selection.contains("`")) this.arrayCast = true;
         selection = selection.replaceAll("[0-9]","");
         selection = selection.replaceAll(" ", "_");
         selection = "__".concat(selection);

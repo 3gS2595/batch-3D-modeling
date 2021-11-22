@@ -56,7 +56,7 @@ public class ObjOutput {
                 int vs = 0;
                 offspring.standardizeScale();
                 offspring.centerObject();
-                offspring.translate(pool.output.get(0).settings.groupStep);
+                offspring.translate(pool.output.get(0).settings.groupStepBy);
                 offspring.translate(seperate);
 
                 Settings settings = offspring.settings;
@@ -109,7 +109,6 @@ public class ObjOutput {
                 writer.write("s off\n");
                 writer.write("g objects\n");
 
-                System.out.println("f");
                 // F
                 if(offspring.f.size() > 0){
                     for (List<Integer> cv : offspring.f) {
@@ -172,7 +171,7 @@ public class ObjOutput {
                 // end of output book keeping
                 Vcnt += vs;
                 cnt++;
-                seperate[0] += settings.separationDistanceX;
+                seperate[0] += settings.separateDistX;
                 pb1.step();
             }
 

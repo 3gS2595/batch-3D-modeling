@@ -2,6 +2,7 @@ package main;
 
 import main.form.Form;
 import main.tasks.miscel.ImageCollect;
+import main.tasks.miscel.arrayCaster;
 import main.tasks.miscel.txtFileCollector;
 import main.tools.ObjOutput;
 import main.pool.ThreadPool;
@@ -49,20 +50,22 @@ public class Main {
 				// saving file
 				pool.output.addAll(pool.setting.wellsprings);
 				if(pool.setting.saveOutput) ObjOutput.output(pool, savepb, runCnt);
-				pool.setting.groupStep[1] += pool.setting.separationDistanceY;
+				pool.setting.groupStepBy[1] += pool.setting.separateDistY;
 			}
+			runCnt++;
 		}
-		runCnt++;
 	}
+
 
 	// reverse run logs
 	boolean reverseRun = false;
 	double initRatio;
+	double[] moveStep = {0,0,0,0};
 	ArrayList<double[]> moves = new ArrayList<>();
 	double initialStep = Double.MAX_VALUE;
 
 	void runGroup(ThreadPool pool) {
-		if (pool.setting.nearestVertice || pool.setting.nearestSurface || pool.setting.nearestSurfaceProj) {
+		if (pool.setting.nearestVertice || pool .setting.nearestSurface || pool.setting.nearestSurfaceProj) {
 			pool.group();
 			Settings.printSettingsGroup(pool.setting);
 
@@ -71,31 +74,36 @@ public class Main {
 				initRatio = pool.setting.ratio;
 				for(Form cur : pool.workingSet.get(0)){
 					moves.add(new double[7]);
+					moveStep = pool.setting.moveStep;
 					System.arraycopy(cur.moved, 0, moves.get(moves.size()-1), 0, cur.moved.length);
+					System.arraycopy(moveStep, 0, pool.setting.moveStep, 0, pool.setting.moveStep.length);
 				}
 			}
-			if(initialStep == Double.MAX_VALUE) initialStep = pool.setting.groupStep[1];
+			if(initialStep == Double.MAX_VALUE) initialStep = pool.setting.groupStepBy[1];
 			if(pool.setting.reversedRepeat && reverseRun){
-				pool.setting.groupStep[1] = initialStep;
-				double[] ro = new double[]{0,180,0};
+				pool.setting.groupStepBy[1] = initialStep;
+				double[] tempRotation = new double[]{0,180,0};
 				for(int i =0; i < pool.workingSet.size(); i++){
 					pool.setting.ratio = initRatio;
 					moves.get(1)[4] += 180;
-					pool.workingSet.get(i)[1].rotate(ro);
+					pool.workingSet.get(i)[1].rotate(tempRotation);
 					for(int x = 0; x < pool.workingSet.get(i).length; x ++)
 						for(int m = 0; m < moves.size(); m++)
 							pool.workingSet.get(i)[m].parentInfo.replace(pool.workingSet.get(i)[m].ObjName, moves.get(m));
 
-					pool.setting.groupStep[0] =
-							(pool.setting.separationDistanceX * pool.setting.iterationCnt)
-							+
-							(pool.setting.separationDistanceX / 2);
+					pool.setting.groupStepBy[0] =
+							(pool.setting.separateDistX * pool.setting.iterationCnt) + (pool.setting.separateDistX / 2);
 				}
 			}
 
+
 			// coupling iterate
 			for (Form[] springPair : pool.workingSet) {
-
+				// THIS IS A VERY DISTURBING THAT THIS MUST BE DONE
+				if(reverseRun){
+					springPair[0].settings.moveStep = moveStep;
+					springPair[1].settings.moveStep = moveStep;
+				}
 				String filesUsed = "";
 				for (String file : springPair[0].parentInfo.keySet()) {
 					String[] temp = file.split("/");
@@ -119,16 +127,18 @@ public class Main {
 					// saving file
 					System.out.println();
 					if(pool.setting.saveOutput) ObjOutput.output(pool, save, runCnt);
-					pool.setting.groupStep[1] += pool.setting.separationDistanceY;
+					pool.setting.groupStepBy[1] += pool.setting.separateDistY;
 					runCnt++;
 				}
 			}
 		}
+		pool.output.clear();
 		if(pool.setting.reversedRepeat && !reverseRun){
 			reverseRun = true;
 			runGroup(pool);
 		}
 	}
+
 
 	void runMaintenance(ThreadPool pool){
 		if (pool.setting.imageCollect) {
@@ -139,7 +149,15 @@ public class Main {
 			txtFileCollector txtCollect = new txtFileCollector();
 			txtCollect.run();
 		}
+		if (pool.setting.arrayCast) {
+			try (ProgressBar pb0 = new ProgressBar(" " + runCnt + "casting array", pool.workingSet.size())) {
+				arrayCaster arrayCast = new arrayCaster(pool, pb0);
+				arrayCast.run();
+			}
+		}
 	}
+
+
 	long startTime = time();
 	long time() {
 		return System.currentTimeMillis();
