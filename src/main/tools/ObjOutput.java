@@ -2,6 +2,9 @@ package main.tools;
 
 import main.form.Form;
 import main.Settings;
+import main.form.weaving.centerMesh;
+import main.form.weaving.standardizeScale;
+import main.form.weaving.translate;
 import main.pool.ThreadPool;
 import me.tongfei.progressbar.ProgressBar;
 
@@ -54,10 +57,10 @@ public class ObjOutput {
             for (Form offspring : pool.output) {
                 // Prints .obj
                 int vs = 0;
-                offspring.standardizeScale();
-                offspring.centerObject();
-                offspring.translate(pool.output.get(0).settings.groupStepBy);
-                offspring.translate(seperate);
+                standardizeScale.standardizeScale(offspring);
+                centerMesh.centerMesh(offspring);
+                translate.translate(offspring, pool.output.get(0).settings.groupStepBy);
+                translate.translate(offspring, seperate);
 
                 Settings settings = offspring.settings;
                 writer.write("# -hephaestus " + "offspring_" + cnt + "\n");

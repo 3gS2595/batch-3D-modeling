@@ -108,6 +108,7 @@ public class ThreadPool extends Thread{
     public void group(){
         SetUp setup = new SetUp();
         this.workingSet = setup.group(this.setting);
+        System.arraycopy(this.workingSet.get(0)[0].settings.moveStep, 0, this.setting.moveStep, 0, this.workingSet.get(0)[0].settings.moveStep.length);
         this.setting.groupCnt = workingSet.size();
     }
 

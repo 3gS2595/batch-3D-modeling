@@ -2,6 +2,7 @@ package main.tools;
 
 import main.form.Form;
 import main.Settings;
+import main.form.weaving.translate;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -90,7 +91,7 @@ public class SetUp {
                         wellSpring[0].moved[0] += -setting.maxDistance[0];
                         wellSpring[0].moved[1] += -setting.maxDistance[1];
                         wellSpring[0].moved[2] += -setting.maxDistance[2];
-                        wellSpring[0].translate(XyzIterationStepInitiator);
+                        translate.translate(wellSpring[0], XyzIterationStepInitiator);
                         wellSpring[0].settings.moveStep = new double[]{
                                 (setting.maxDistance[0] * 2) / setting.iterationCnt,
                                 (setting.maxDistance[1] * 2) / setting.iterationCnt,
@@ -101,6 +102,7 @@ public class SetUp {
                                 (setting.rotation[1]) / setting.iterationCnt,
                                 (setting.rotation[2]) / setting.iterationCnt};
                         wellsprings.add(wellSpring);
+                        System.out.println(wellSpring[0].settings.moveStep[0]+"final last");
                     }
                 }
             }

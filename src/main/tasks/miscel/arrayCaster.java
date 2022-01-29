@@ -1,6 +1,7 @@
 package main.tasks.miscel;
 
 import main.form.Form;
+import main.form.weaving.translate;
 import main.pool.ThreadPool;
 import main.tasks.Task;
 import main.tools.ObjOutput;
@@ -14,7 +15,7 @@ public class arrayCaster implements Task {
 	public arrayCaster(ThreadPool pool, ProgressBar pb0){
 		this.pool = pool;
 		this.pb0 = pb0;
-		pool.setting.separateDistY = 1.4;
+		pool.setting.separateDistZ = 1.4;
 		pool.setting.separateDistX = 1.4;
 	}
 
@@ -37,14 +38,14 @@ public class arrayCaster implements Task {
 				if(pool.output.size() != 0) {
 					ObjOutput.output(pool, pb0, runCnt);
 					runCnt++;
-					pool.setting.groupStepBy[1] += pool.setting.separateDistY;
+					pool.setting.groupStepBy[1] += pool.setting.separateDistZ;
 				} else {
 					System.exit(1);
 				}
 				pool.output.clear();
 			} else {
 				Form form = pool.setting.wellsprings.get(prog);
-				form.translate(trans);
+				translate.translate(form, trans);
 				System.out.println(form.ObjName);
 				pool.output.add(form);
 				cnt++;

@@ -13,6 +13,10 @@ import java.util.Scanner;
 //      most impactful implementation blossoming of AI
 //      single image form reconstruction
 //      broaden my python experience / general resume inflation
+//      i have exhausted time i can allow myself to allot in the darkness,
+//      print now, while you begin to write, apply to graduate school it cant be negotiatable
+//      contain yourself, breath anew your sacred matras into the night, cradle your arms blossom in sight
+//      cut drastically nearly every current habit till thy gardens basked in light
 
 //TODO peak priori
 //  decimate full canonization in point cloud density
@@ -39,8 +43,9 @@ import java.util.Scanner;
 public  class Settings {
 
     // hardware
-    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\input\\cube";
-    public String          outputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\output";
+//    public String           inputFolder = "C:\\Users\\lucoius\\Documents\\3c9f3\\hepheastus\\vein\\input\\cube";
+    public String           inputFolder = "D:\\haeph\\in\\triadistic";
+    public String          outputFolder = "D:\\haeph\\out";
     public String   outputFileNameNotes = "cold_moon_brights_in_the_sun";
 
     // routine
@@ -53,18 +58,19 @@ public  class Settings {
     // render
     public double[]         maxDistance = {0,0,0};
     public double[]            rotation = {0,0,0};
-    public double                 ratio = .44;
+    public double                 ratio = 0.65;
     public double              minRatio = .09;
     public int             iterationCnt = 4;
     public boolean         iterateRatio = false;
+    public boolean         iteratePosit = false;
     public boolean       reversedRepeat = false;
     public boolean     standardizeScale = true;
     public boolean        centerObjects = true;
 
     // optionals
     public boolean manualParentSelection = false;
-    public double          separateDistX = 1.1;
-    public double          separateDistY = .4;
+    public double          separateDistX = .8;
+    public double separateDistZ = .6;
     public boolean            saveOutput = true;
     public boolean          un_spinForms = true;
     public int                 threadCnt = 18;
@@ -73,6 +79,7 @@ public  class Settings {
     public boolean         imageCollect = false;
     public boolean           txtCollect = false;
     public boolean            arrayCast = false;
+    public boolean            csv = false;
 
 
 
@@ -85,7 +92,7 @@ public  class Settings {
 
 
     // produce family tree charts automatically in info file ? could make sure i switch
-    // //information oer during exports and build info within each obj during generation
+    // information over during exports and build info within each obj during generation
 
     // pairs should be done through a list string arrays correlating to spring ID
     // splice a new spring and take what you need from any number of forms
@@ -116,11 +123,7 @@ public  class Settings {
         this.outputFolder = ObjOutput.createOutputFolder(this);
         this.wellsprings = setup.singles;
         this.groupCnt = this.wellsprings.size();
-        this.moveStep = new double[]{
-                0,
-                0,
-                0,
-                ((this.ratio - this.minRatio) / this.iterationCnt)};
+        this.moveStep[3] = ((this.ratio - this.minRatio) / this.iterationCnt);
     }
 
     @SuppressWarnings("CopyConstructorMissesField")
@@ -141,7 +144,7 @@ public  class Settings {
         this.centerObjects = settings.centerObjects;
         this.manualParentSelection = settings.manualParentSelection;
         this.separateDistX = settings.separateDistX;
-        this.separateDistY = settings.separateDistY;
+        this.separateDistZ = settings.separateDistZ;
         this.saveOutput = settings.saveOutput;
         this.un_spinForms = settings.un_spinForms;
         this.threadCnt = settings.threadCnt;
@@ -209,11 +212,10 @@ public  class Settings {
         System.out.println("[3] decimate");
         System.out.println("*");
         System.out.println("[4] iterate ratio");
+        System.out.println("[7] iterate position");
         System.out.println("[5] reverse run");
         System.out.println("[6] manual wellsprings");
-        System.out.println("[9] primary well designation");
         System.out.println("*");
-        System.out.println("[7] no saving");
         System.out.println("[9] congregate image");
         System.out.println("[*] congregate texts");
         System.out.println("[`] congregate texts");
@@ -228,11 +230,12 @@ public  class Settings {
         if(selection.contains("4")) this.iterateRatio = true;
         if(selection.contains("5")) this.reversedRepeat = true;
         if(selection.contains("6")) this.manualParentSelection = true;
-        if(selection.contains("7")) this.saveOutput = false;
+        if(selection.contains("7")) this.iteratePosit = true;
         if(selection.contains("8")) this.nearestSurfaceProj = true;
         if(selection.contains("9")) this.imageCollect = true;
         if(selection.contains("*")) this.txtCollect = true;
         if(selection.contains("`")) this.arrayCast = true;
+        if(selection.contains("@")) this.csv = true;
         selection = selection.replaceAll("[0-9]","");
         selection = selection.replaceAll(" ", "_");
         selection = "__".concat(selection);

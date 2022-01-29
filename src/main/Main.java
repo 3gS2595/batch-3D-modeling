@@ -1,8 +1,11 @@
 package main;
 
 import main.form.Form;
+import main.form.weaving.rotate;
+import main.form.weaving.step;
 import main.tasks.miscel.ImageCollect;
 import main.tasks.miscel.arrayCaster;
+import main.tasks.miscel.csv;
 import main.tasks.miscel.txtFileCollector;
 import main.tools.ObjOutput;
 import main.pool.ThreadPool;
@@ -50,7 +53,7 @@ public class Main {
 				// saving file
 				pool.output.addAll(pool.setting.wellsprings);
 				if(pool.setting.saveOutput) ObjOutput.output(pool, savepb, runCnt);
-				pool.setting.groupStepBy[1] += pool.setting.separateDistY;
+				pool.setting.groupStepBy[1] += pool.setting.separateDistZ;
 			}
 			runCnt++;
 		}
@@ -86,7 +89,7 @@ public class Main {
 				for(int i =0; i < pool.workingSet.size(); i++){
 					pool.setting.ratio = initRatio;
 					moves.get(1)[4] += 180;
-					pool.workingSet.get(i)[1].rotate(tempRotation);
+					rotate.rotate(pool.workingSet.get(i)[1], tempRotation);
 					for(int x = 0; x < pool.workingSet.get(i).length; x ++)
 						for(int m = 0; m < moves.size(); m++)
 							pool.workingSet.get(i)[m].parentInfo.replace(pool.workingSet.get(i)[m].ObjName, moves.get(m));
@@ -120,14 +123,18 @@ public class Main {
 					// commands run
 					if(pool.setting.iterateRatio) springPair[0].settings.ratio = springPair[0].settings.minRatio;
 					for (double i = 0; i < pool.setting.iterationCnt; i++) {
-						Form.step(springPair);
+						for(double x : springPair[0].settings.moveStep){
+							System.out.println(x);
+						}
+						System.out.println();
+						step.step(springPair);
 						pool.initializeTaskGroup(springPair);
 						pool.run(prod);
 					}
 					// saving file
 					System.out.println();
 					if(pool.setting.saveOutput) ObjOutput.output(pool, save, runCnt);
-					pool.setting.groupStepBy[1] += pool.setting.separateDistY;
+					pool.setting.groupStepBy[1] += pool.setting.separateDistZ;
 					runCnt++;
 				}
 			}
@@ -148,6 +155,10 @@ public class Main {
 		if (pool.setting.txtCollect) {
 			txtFileCollector txtCollect = new txtFileCollector();
 			txtCollect.run();
+		}
+		if (pool.setting.csv) {
+			csv csv = new csv();
+			csv.run();
 		}
 		if (pool.setting.arrayCast) {
 			try (ProgressBar pb0 = new ProgressBar(" " + runCnt + "casting array", pool.workingSet.size())) {

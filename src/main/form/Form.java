@@ -1,11 +1,11 @@
 package main.form;
 
+import main.form.weaving.*;
 import main.Settings;
 import org.tinspin.index.qthypercube2.QuadTreeKD2;
-
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
 import static main.tools.ObjIntake.intake;
 
 public class Form {
@@ -18,7 +18,6 @@ public class Form {
 	public QuadTreeKD2<Object> KdTree = QuadTreeKD2.create(3);
 	public QuadTreeKD2<Object> newPointss = QuadTreeKD2.create(3);
 
-
 	// file input
 	public ArrayList<double[]>     v = new ArrayList<>();
 	public List<double[]>    vn = new ArrayList<>();
@@ -26,11 +25,6 @@ public class Form {
 	public List<List<Integer>>f = new ArrayList<>();
 	public List<List<Integer>>newf = new ArrayList<>();
 	public List<Material>  mats = new ArrayList<>();
-
-	// normal averaging ;unless optioned untouched
-	public List<double[]> 						  vNavg = new ArrayList<>();
-	public HashMap<Integer,List<Integer>> siblingPoints = new HashMap<>();
-	public HashMap<Integer,List<List<Integer>>> siblingPolys = new HashMap<>();
 
 	// thread coordination
 	public ConcurrentHashMap<Integer, double[]> newPoints  = new ConcurrentHashMap<>();
@@ -41,7 +35,10 @@ public class Form {
 	public HashMap<String, double[]> parentInfo = new HashMap<>();
 	public double[] moved = {0,0,0,0,0,0}; // variable used during moving
 
-
+	// normal averaging ;unless optioned untouched
+	public List<double[]> 						  vNavg = new ArrayList<>();
+	public HashMap<Integer,List<Integer>> siblingPoints = new HashMap<>();
+	public HashMap<Integer,List<List<Integer>>> siblingPolys = new HashMap<>();
 
 
 	// constructor----------------------------------
@@ -53,10 +50,11 @@ public class Form {
 		this.id = nameSplit[nameSplit.length-1];
 
 		intake(this);
-		if (this.settings.centerObjects) this.centerObject();
-		if (this.settings.standardizeScale) this.standardizeScale();
-
-		this.buildTree();
+		System.out.println("STEOP" + this.settings.moveStep[0]);
+		if (this.settings.centerObjects) centerMesh.centerMesh(this);
+		if (this.settings.standardizeScale) standardizeScale.standardizeScale(this);
+		standardizeSeparation.standardizeSeparation(this);
+		buildTree.buildTree(this);
 	}
 
 	// used to make basis for offspring
@@ -68,174 +66,17 @@ public class Form {
 		this.siblingPoints = form.siblingPoints;
 		this.settings = new Settings(form.settings);
 		this.settings.moveStep = form.settings.moveStep;
-		System.arraycopy(form.settings.moveStep, 0, this.settings.moveStep, 0, form.settings.moveStep.length);
 		this.v = new ArrayList<>(form.v);
 		this.vn = new ArrayList<>(form.vn);
 		this.rawf = new ArrayList<>(form.rawf);
 		this.f = new ArrayList<>(form.f);
 		this.KdTree = form.KdTree;
 		this.siblingPolys = form.siblingPolys;
+		System.arraycopy(form.settings.moveStep, 0, this.settings.moveStep, 0, form.settings.moveStep.length);
 		for (Map.Entry<String, double[]> entry : form.parentInfo.entrySet()) {
 			double[] arrayCopy = new double[entry.getValue().length];
 			System.arraycopy(entry.getValue(), 0, arrayCopy, 0, entry.getValue().length);
 			this.parentInfo.put(entry.getKey(), arrayCopy);
 		}
-	}
-
-	public void buildTree() {
-		this.KdTree.clear();
-		this.KdTree = QuadTreeKD2.create(3);
-		for(int i = 0; i < this.v.size(); i++){
-			this.KdTree.insert(new double[]{this.v.get(i)[0], this.v.get(i)[1], this.v.get(i)[2]}, i);
-		}
-	}
-
-	// modulates iterational lip
-	public static void step(Form[] wellspring){
-		double[] step = new double[]{
-				wellspring[1].settings.moveStep[0],
-				wellspring[1].settings.moveStep[1],
-				wellspring[1].settings.moveStep[2]};
-		double[] m0 = new double[wellspring[0].parentInfo.get(wellspring[0].ObjName).length];
-		System.arraycopy(wellspring[0].parentInfo.get(wellspring[0].ObjName), 0, m0, 0,wellspring[0].parentInfo.get(wellspring[0].ObjName).length);
-
-		double[] m1 = new double[wellspring[0].parentInfo.get(wellspring[1].ObjName).length];
-		System.arraycopy(wellspring[0].parentInfo.get(wellspring[1].ObjName), 0, m1, 0,wellspring[0].parentInfo.get(wellspring[1].ObjName).length);
-
-		wellspring[1].translate(step);
-		m1[0] += wellspring[1].settings.moveStep[0];
-		m1[1] += wellspring[1].settings.moveStep[1];
-		m1[2] += wellspring[1].settings.moveStep[2];
-
-		wellspring[1].rotate(wellspring[1].settings.tempRotate);
-		m1[3] += wellspring[0].settings.tempRotate[0];
-		m1[4] += wellspring[0].settings.tempRotate[1];
-		m1[5] += wellspring[0].settings.tempRotate[2];
-
-		wellspring[0].parentInfo.replace(wellspring[0].ObjName, m0);
-		wellspring[0].parentInfo.replace(wellspring[1].ObjName, m1);
-		wellspring[1].parentInfo.replace(wellspring[0].ObjName, m0);
-		wellspring[1].parentInfo.replace(wellspring[1].ObjName, m1);
-//		System.out.println(wellspring[1].parentInfo.get(wellspring[1].ObjName)[4]);
-
-		if(wellspring[0].settings.iterateRatio){
-			wellspring[0].settings.ratio += wellspring[0].settings.moveStep[3];
-		}
-	}
-
-	public void standardizeScale(){
-		double[] max = this.v.get(1).clone();
-		double[] min = this.v.get(1).clone();
-
-		// loops xyz's
-		for (double[] doubles : this.v) {
-			double[] vert = doubles.clone();
-			for (int j = 0; j <= 2; j++) {
-				if (vert[j] > max[j]) {
-					max[j] = vert[j];
-				}
-				if (vert[j] < min[j]) {
-					min[j] = vert[j];
-				}
-			}
-		}
-
-		double num = Math.pow((max[0] - min[0]), 2) + Math.pow((max[1] - min[1]), 2) + Math.pow((max[2] - min[2]), 2);
-		double distance = Math.sqrt(num);
-		double scaleMult = 1 / distance;
-		for (int i = 0; i < this.v.size(); i++) {
-			v.set(i, new double[]{this.v.get(i)[0] * scaleMult, this.v.get(i)[1] * scaleMult, this.v.get(i)[2] * scaleMult});
-		}
-	}
-
-	public void centerObject() {
-		double[] max = this.v.get(0).clone();
-		double[] min = this.v.get(0).clone();
-		for (double[] doubles : this.v) {
-			double[] vert = doubles.clone();
-			// loops xyz
-			for (int j = 0; j < 3; j++) {
-				if (vert[j] > max[j]) {
-					max[j] = vert[j];
-				}
-				if (vert[j] < min[j]) {
-					min[j] = vert[j];
-				}
-			}
-		}
-
-		double[] center = {(max[0]+min[0])/2,(max[1]+min[1])/2,(max[2]+min[2])/2};
-		for(int i = 0; i < this.v.size(); i ++) {
-			double[] corrected = {this.v.get(i)[0] - center[0], this.v.get(i)[1] - center[1], this.v.get(i)[2] - center[2]};
-			v.set(i, corrected);
-		}
-	}
-
-	public void translate(double[] amount){
-		if (!Arrays.equals(amount, new double[]{0, 0, 0})) {
-			for (int i = 0; i < this.v.size(); i++) {
-				double[] corrected = {this.v.get(i)[0] + amount[0], this.v.get(i)[1] + amount[1], this.v.get(i)[2] + amount[2]};
-				v.set(i, corrected);
-			}
-		}
-		this.buildTree();
-	}
-
-	// ROTATE
-	public void rotate(double[] rotation) {
-		if ( rotation[0] != 0 || rotation[1] != 0 || rotation[2] != 0) {
-			double[][] tranM = new double[4][4];
-			for (int i = 0; i < 4; i++)
-				for (int j = 0; j < 4; j++)
-					tranM[i][j] = 0;
-
-			tranM[0][0] = 1;
-			tranM[1][1] = 1;
-			tranM[2][2] = 1;
-			tranM[3][3] = 1;
-			if (rotation[0] > 0) {
-				double theta = Math.toRadians(rotation[0]);
-				double cos = Math.cos(theta);
-				double sin = Math.sin(theta);
-				tranM[1][1] = cos;
-				tranM[1][2] = -sin;
-				tranM[2][1] = sin;
-				tranM[2][2] = cos;
-				executeRotate(tranM);
-			}
-			if (rotation[1] > 0) {
-				double theta = Math.toRadians(rotation[1]);
-				double cos = Math.cos(theta);
-				double sin = Math.sin(theta);
-				tranM[0][0] = cos;
-				tranM[0][2] = sin;
-				tranM[2][0] = -sin;
-				tranM[2][2] = cos;
-				executeRotate(tranM);
-			}
-			if (rotation[2] > 0) {
-				double theta = Math.toRadians(rotation[2]);
-				double cos = Math.cos(theta);
-				double sin = Math.sin(theta);
-				tranM[0][1] = cos;
-				tranM[0][1] = -sin;
-				tranM[1][0] = sin;
-				tranM[1][1] = cos;
-				executeRotate(tranM);
-			}
-		}
-	}
-	private void executeRotate(double[][] tranM){
-		for (int i = 0; i < this.v.size(); i++) {
-			double x = this.v.get(i)[0];
-			double y = this.v.get(i)[1];
-			double z = this.v.get(i)[2];
-			double[] prime = new double[3];
-			prime[0] = (x * tranM[0][0]) + (y * tranM[0][1]) + (z * tranM[0][2]) + (1 * tranM[0][3]);
-			prime[1] = (x * tranM[1][0]) + (y * tranM[1][1]) + (z * tranM[1][2]) + (1 * tranM[1][3]);
-			prime[2] = (x * tranM[2][0]) + (y * tranM[2][1]) + (z * tranM[2][2]) + (1 * tranM[2][3]);
-			this.v.set(i, new double[]{prime[0], prime[1], prime[2]});
-		}
-		this.buildTree();
 	}
 }
