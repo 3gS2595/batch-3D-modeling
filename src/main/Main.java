@@ -103,7 +103,7 @@ public class Main {
 
 			// coupling iterate
 			for (Form[] springPair : pool.workingSet) {
-				// THIS IS A VERY DISTURBING THAT THIS MUST BE DONE
+				// todo why is this be like this do be though
 				if(reverseRun){
 					springPair[0].settings.moveStep = moveStep;
 					springPair[1].settings.moveStep = moveStep;
