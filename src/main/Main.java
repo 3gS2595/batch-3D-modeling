@@ -5,8 +5,9 @@ import main.form.weaving.rotate;
 import main.form.weaving.step;
 import main.tasks.miscel.ImageCollect;
 import main.tasks.miscel.arrayCaster;
-import main.tasks.miscel.csv;
 import main.tasks.miscel.txtFileCollector;
+import main.tasks.miscel.csv;
+import main.tasks.miscel.gestaltClean;
 import main.tools.ObjOutput;
 import main.pool.ThreadPool;
 import me.tongfei.progressbar.ProgressBar;
@@ -159,6 +160,10 @@ public class Main {
 		if (pool.setting.csv) {
 			csv csv = new csv();
 			csv.run();
+		}
+		if (pool.setting.gestaltClean) {
+			gestaltClean gc = new gestaltClean();
+			gc.run();
 		}
 		if (pool.setting.arrayCast) {
 			try (ProgressBar pb0 = new ProgressBar(" " + runCnt + "casting array", pool.workingSet.size())) {

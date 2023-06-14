@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ImageCollect implements Task {
-	 String src = "C:\\Users\\lucoius\\Documents\\3c9f3\\forms\\form\\";
-	 String dst = "C:\\Users\\lucoius\\Documents\\3c9f3\\forms\\form\\0_PHONE DIRECTORY\\";
+	 String src = "D:\\c71238796\\26e72a9\\forms\\form";
+	 String dst = "D:\\c71238796\\26e72a9\\mappings\\form\\0_PHONE DIRECTORY\\";
 
 	public ImageCollect() {
 	}

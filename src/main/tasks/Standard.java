@@ -26,7 +26,7 @@ public class Standard implements Task {
     public void run() {
         // retrieves nearest neighbor (nn
         Collection<QEntryDist<Object>> nearestNeighbor = pairSpring[1].KdTree.knnQuery(pairSpring[0].v.get(i), 1);
-        double[] closeV = ((QEntry)nearestNeighbor.toArray()[0]).point();
+        double[] closeV = ((QEntry<?>)nearestNeighbor.toArray()[0]).point();
 
         // calculates distance to nn
         double num = 0;
