@@ -92,26 +92,8 @@ public class Ray {
                 n = Maths.mult(n, (1.0f / nLen));
             }
 
-            //    Project point p onto the plane spanned by a->b and a->c.
-            //
-            //    Given a plane
-            //
-            //        a : point on plane
-            //        n : *unit* normal to plane
-            //
-            //    Then the *signed* distance from point p to the plane
-            //    (in the direction of the normal) is
-            //
-            //        dist = p . n - a . n
-            //
             double dist = Maths.dot(p, n) - (Maths.dot(a, n));
-
-            // Project p onto the plane by stepping the distance from p to the plane
-            // in the direction opposite the normal: proj = p - dist * n
             double[] proj =  Maths.sub(p, Maths.mult(n, dist));
-
-            // Find out if the projected point falls within the triangle -- see:
-            // http://blackpawn.com/texts/pointinpoly/default.html
 
             // Compute edge vectors
             double v0x = c[0] - a[0];
@@ -141,12 +123,10 @@ public class Ray {
             double u = (dot11 * dot02 - dot01 * dot12) * invDenom;
             double v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
-
                 if(recordDist > dist) {
                     recordDist = dist;
                     recordPnt = proj;
                 }
-
         }
         return recordPnt;
     }
